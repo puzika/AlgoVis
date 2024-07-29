@@ -65,6 +65,7 @@ export default function NetworkAnimation() {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       let animationId;
+      let curArea = window.innerWidth * window.innerHeight;
 
       const setCanvasSize = () => {
          canvas.width = window.innerWidth;
@@ -78,9 +79,13 @@ export default function NetworkAnimation() {
       window.addEventListener('resize', () => {
          setCanvasSize();
 
-         isFinite(animationId) && cancelAnimationFrame(animationId);
+         if (Math.abs(canvas.width * canvas.height - curArea) > 50000) {
+            isFinite(animationId) && cancelAnimationFrame(animationId);
 
-         animationId = initNetwork(canvas, ctx);
+            animationId = initNetwork(canvas, ctx);
+
+            curArea = canvas.width * canvas.height;
+         }
       });
 
       return () => {

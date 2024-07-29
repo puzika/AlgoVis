@@ -5,6 +5,7 @@ export default function Home() {
    return (
       <S.Home>
          <NetworkAnimation></NetworkAnimation>
+         <S.HomeContent></S.HomeContent>
       </S.Home>
    )
 }
