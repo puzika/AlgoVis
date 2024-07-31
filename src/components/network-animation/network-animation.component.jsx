@@ -34,7 +34,7 @@ function connect(particles, ctx) {
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.lineWidth = 1;
-            ctx.strokeStyle = `rgba(0, 128, 255, ${1 - curDist / maxDist})`;
+            ctx.strokeStyle = svar.colorPrimaryWithOpacity(1 - curDist / maxDist);
             ctx.stroke();
          }
       }
