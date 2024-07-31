@@ -5,7 +5,6 @@ export const Home = styled.div`
    position: relative;
    width: 100%; 
    height: 100vh;
-   color: white;
    overflow: hidden; 
 `;
 
