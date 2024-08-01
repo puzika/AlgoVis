@@ -6,6 +6,7 @@ const arrowWidth = arrowHeight;
 const arrowMarginBottom = arrowHeight * Math.sqrt(2) / 2 - arrowHeight / 2;
 
 export const Dropdown = styled.div`
+   position: relative;
    display: flex;
    align-items: center;
    height: 4.5rem;
@@ -14,7 +15,7 @@ export const Dropdown = styled.div`
    cursor: pointer;
 
    &:hover {
-      background-color: rgba(255, 255, 255, .1);
+      background-color: ${svar.colorBaseLight};
 
       .arrow {
          margin-bottom: 0;

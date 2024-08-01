@@ -5,6 +5,7 @@ export default function Dropdown({ name, children }) {
       <S.Dropdown>
          <span>{name}</span>
          <S.DropdownArrow className='arrow' />
+         {children}
       </S.Dropdown>
    )
 }
