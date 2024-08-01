@@ -4,7 +4,8 @@ import * as svar from '../../variables.styles';
 export const Button = styled.button`
    font-size: inherit;
    color: inherit;
-   padding: 1rem 2rem;
+   padding: 0 2rem;
+   height: 4.5rem;
    border: .2rem solid ${svar.colorPrimaryLight}; 
    border-radius: 10rem;
    outline: none;
