@@ -12,15 +12,21 @@ export const Dropdown = styled.div`
    height: 4.5rem;
    padding: 0 2.5rem;
    border-radius: 10rem;
+   transition: background-color .5s;
    cursor: pointer;
 
    &:hover {
       background-color: ${svar.colorBaseLight};
 
-      .arrow {
+      .dropdown-arrow {
          margin-bottom: 0;
          margin-top: ${arrowMarginBottom}rem;
          rotate: X 180deg;
+      }
+
+      ul {
+         visibility: visible;
+         opacity: 1;
       }
    }
 `;
@@ -33,5 +39,5 @@ export const DropdownArrow = styled.span`
    transform: rotate(45deg);
    margin-left: 2rem;
    margin-bottom: ${arrowMarginBottom}rem;
-   transition: all .2s;
+   transition: all .25s;
 `;
