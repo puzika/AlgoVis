@@ -5,8 +5,8 @@ export const ButtonTypes = {
    filled: 'filled',
 }
 
-export default function Button({text, styleType}) {
+export default function Button({name, styleType}) {
    return (
-      <S.Button $styleType={styleType}>{text}</S.Button>
+      <S.Button $styleType={styleType}>{name}</S.Button>
    );
 }

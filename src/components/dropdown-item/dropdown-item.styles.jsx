@@ -7,7 +7,6 @@ export const DropdownItem = styled.li`
    padding: 2rem;
    background-image: linear-gradient(
       to right, 
-      ${svar.colorPrimaryLighter}, 
       ${svar.colorPrimary}, 
       ${svar.colorBase}
    );
