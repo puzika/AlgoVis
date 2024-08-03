@@ -7,3 +7,7 @@ export const ToolBar = styled.header`
    align-items: center;
    height: 10rem;
 `;
+
+export const Img = styled.img`
+   height: 3.5rem;
+`

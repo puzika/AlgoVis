@@ -1,7 +1,7 @@
 import * as S from './dropdown-item.styles';
 
-export default function DropdownItem({name}) {
+export default function DropdownItem({name, clickHandler}) {
    return (
-      <S.DropdownItem>{name}</S.DropdownItem>
+      <S.DropdownItem onClick={clickHandler}>{name}</S.DropdownItem>
    )
 }
