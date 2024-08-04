@@ -5,8 +5,8 @@ export const ButtonTypes = {
    filled: 'filled',
 }
 
-export default function Button({name, styleType}) {
+export default function Button({name, styleType, clickHandler}) {
    return (
-      <S.Button $styleType={styleType}>{name}</S.Button>
+      <S.Button onClick={clickHandler} $styleType={styleType}>{name}</S.Button>
    );
 }

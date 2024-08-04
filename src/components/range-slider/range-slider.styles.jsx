@@ -10,5 +10,5 @@ export const RangeLabel = styled.label`
 
 export const RangeSlider = styled.input`
    width: 100%;
-   outline: hidden;
+   outline: none;
 `;
