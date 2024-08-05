@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useRef } from 'react';
 import { ArrayContext } from '../../contexts/array';
 import Toolbar from '../../components/toolbar/toolbar.component';
 import Button, { ButtonTypes } from '../../components/button/button.component';
@@ -19,6 +19,7 @@ function formatAlgName(algName) {
 export default function Sorting() {
    const {size, setSize, algorithm, setAlgorithm} = useContext(ArrayContext);
    const [array, setArray] = useState(generateRandomArray(size));
+   const barRefs = useRef([]);
 
    function handleChange(e) {
       const newSize = e.target.value;
@@ -33,8 +34,8 @@ export default function Sorting() {
 
    function handleSort() {
       const algName = formatAlgName(algorithm);
-      const sortedArray = algorithms[algName]([...array]);
-      console.log(array, sortedArray);
+      const sortedArray = algorithms[algName]([...array], barRefs.current);
+      console.log(sortedArray);
    }
 
    return (
@@ -53,7 +54,7 @@ export default function Sorting() {
          </Toolbar>
          <AppContainer>
             <SortDataBar algorithm={algorithm} size={size} />
-            <SortArrayContainer array={array} />
+            <SortArrayContainer refs={barRefs} array={array} />
          </AppContainer>
       </>
    )

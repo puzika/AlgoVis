@@ -1,12 +1,19 @@
 import * as S from './sort-array-container.styles';
-import SortArrayBar from '../sort-array-bar/sort-array-bar.component';
+import {SortArrayBar} from '../sort-array-bar/sort-array-bar.component';
+import { useEffect } from 'react';
 
-export default function SortArrayContainer({array}) {
+export default function SortArrayContainer({array, refs}) {
+   useEffect(() => {
+      refs.current = refs.current.slice(0, array.length);
+   }, [array]);
+
+   console.log(refs);
+
    return (
       <S.SortArrayContainer>
          {
-            array.map(el => (
-               <SortArrayBar key={crypto.randomUUID()} height={el} />
+            array.map((el, idx) => (
+               <SortArrayBar ref={(element) => refs.current[idx] = element} key={idx} height={el} />
             ))
          }
       </S.SortArrayContainer>

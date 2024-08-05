@@ -1,7 +1,8 @@
+import { forwardRef } from 'react';
 import * as S from './sort-array-bar.styles';
 
-export default function SortArrayBar({height}) {
+export const SortArrayBar = forwardRef(({height}, ref) => {
    return (
-      <S.SortArrayBar height={height} />
+      <S.SortArrayBar style={{height: `${height}rem`}} ref={ref} />
    )
-}
+});
