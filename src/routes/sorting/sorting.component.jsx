@@ -35,7 +35,7 @@ export default function Sorting() {
    async function handleSort() {
       const algName = formatAlgName(algorithm);
       const sortedArray = await algorithms[algName]([...array], barRefs.current);
-      console.log(array, sortedArray);
+      setArray(sortedArray);
    }
 
    return (

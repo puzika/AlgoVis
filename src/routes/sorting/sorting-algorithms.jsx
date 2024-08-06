@@ -93,28 +93,63 @@ async function heapSort(array, elems) {
    return array;
 }
 
-function mergeSort(array, elems) {
-   function mergeIdx(leftChunk, rightChunk) {
+async function mergeSort(array, elems) {
+   async function mergeIdx(leftChunk, rightChunk) {
       const merged = [];
       let leftIdx = 0;
       let rightIdx = 0;
+      let currentElemIdx = Math.min(...leftChunk);
 
       while (leftIdx < leftChunk.length && rightIdx < rightChunk.length) {
+         const leftElem = elems[leftChunk[leftIdx]];
+         const rightElem = elems[rightChunk[rightIdx]];
+         const currentElem = elems[currentElemIdx];
+
+         await highlight(array.length, leftElem, rightElem);
+
          if (array[leftChunk[leftIdx]] < array[rightChunk[rightIdx]]) {
             merged.push(leftChunk[leftIdx]);
+            currentElem.style.height = `${array[leftChunk[leftIdx]]}rem`;
+            await highlight(array.length, currentElem);
             leftIdx++;
          } else {
             merged.push(rightChunk[rightIdx]);
+            currentElem.style.height = `${array[rightChunk[rightIdx]]}rem`;
+            await highlight(array.length, currentElem);
             rightIdx++;
          }
+
+         currentElemIdx++;
       }
 
-      return merged.
-         concat(leftChunk.slice(leftIdx)).
-         concat(rightChunk.slice(rightIdx));
+      while (leftIdx < leftChunk.length) {
+         merged.push(leftChunk[leftIdx]);
+
+         const currentElem = elems[currentElemIdx];
+
+         currentElem.style.height = `${array[leftChunk[leftIdx]]}rem`;
+         await highlight(array.length, currentElem);
+
+         leftIdx++;
+         currentElemIdx++;
+      }
+
+      while (rightIdx < rightChunk.length) {
+         merged.push(rightChunk[rightIdx]);
+
+         const currentElem = elems[currentElemIdx];
+
+         currentElem.style.height = `${array[rightChunk[rightIdx]]}rem`;
+         await highlight(array.length, currentElem);
+
+         rightIdx++;
+         currentElemIdx++;
+      }
+
+      return merged;
    }
 
-   function mergeSortIdx(idxArr) {
+   async function mergeSortIdx(idxArr) {
       if (idxArr.length <= 1) return idxArr;
 
       const middle = Math.floor(idxArr.length / 2);
@@ -122,11 +157,11 @@ function mergeSort(array, elems) {
       const leftChunk = idxArr.slice(0, middle);
       const rightChunk = idxArr.slice(middle);
 
-      return mergeIdx(mergeSortIdx(leftChunk), mergeSortIdx(rightChunk));
+      return await mergeIdx(await mergeSortIdx(leftChunk), await mergeSortIdx(rightChunk));
    }
 
    const idxArr = array.map((_, idx) => idx);
-   const sortedIdxArr = mergeSortIdx(idxArr);
+   const sortedIdxArr = await mergeSortIdx(idxArr);
 
    return sortedIdxArr.map(idx => array[idx]);
 }
