@@ -23,7 +23,7 @@ function delay(time) {                 //TIME  ---- ARRAY SIZE. I.E. ARRAY SIZE 
 }
 
 async function highlight(time, ...elems) {
-   elems.forEach(elem => elem && (elem.style.boxShadow = `0 0 2rem ${svar.colorPrimary}`));
+   elems.forEach(elem => elem && (elem.style.boxShadow = `0 0 1rem .5rem ${svar.colorPrimaryLighter}`));
    await delay(time);
    elems.forEach(elem => elem && (elem.style.boxShadow = 'none'));
 }
@@ -35,33 +35,48 @@ function swapElems(elem1, elem2) {
    elem2.style.height = `${height1}px`;
 }
 
-async function heapify(array, size, index, elems) {
-   let largest = index;
-   const left = 2 * index + 1;
-   const right = 2 * index + 2;
-
-   const indexElem = elems[index];
-   const leftElem = elems[left];
-   const rightElem = elems[right];
-
-   await highlight(array.length, indexElem, leftElem, rightElem);
-
-   if (left < size && array[left] > array[largest]) largest = left;
-   if (right < size && array[right] > array[largest]) largest = right;
-
-   if (largest !== index) {
-      [array[index], array[largest]] = [array[largest], array[index]];
-
-      const largestElem = elems[largest];
-      await highlight(array.length, indexElem, largestElem);
-      swapElems(indexElem, largestElem);
-
-      await heapify(array, size, largest, elems);
-   }
-}
-
 async function heapSort(array, elems) {
-   for (let i = Math.floor(array.length / 2) - 1; i >= 0; i--) await heapify(array, array.length, i, elems);
+   async function heapify(size, index) {
+      let largest = index;
+      const left = 2 * index + 1;
+      const right = 2 * index + 2;
+
+      const leftElem = elems[left];
+      const rightElem = elems[right];
+
+      if (left < size) {
+         const largestElem = elems[largest];
+         await highlight(array.length, largestElem, leftElem);
+
+         if (array[left] > array[largest]) {
+            largest = left;
+         }
+      }
+
+      if (right < size) {
+         const largestElem = elems[largest];
+         await highlight(array.length, largestElem, rightElem);
+
+         if (array[right] > array[largest]) {
+            largest = right;
+         }
+      } 
+
+      if (largest !== index) {
+         [array[index], array[largest]] = [array[largest], array[index]];
+
+         const indexElem = elems[index];
+         const largestElem = elems[largest];
+
+         await highlight(array.length, indexElem, largestElem);
+
+         swapElems(indexElem, largestElem);
+
+         await heapify(size, largest);
+      }
+   }
+
+   for (let i = Math.floor(array.length / 2) - 1; i >= 0; i--) await heapify(array.length, i);
    
    for (let i = array.length - 1; i > 0; i--) {
       [array[i], array[0]] = [array[0], array[i]];
@@ -72,39 +87,48 @@ async function heapSort(array, elems) {
       await highlight(array.length, iElem, zeroElem);
       swapElems(iElem, zeroElem);
 
-      await heapify(array, i, 0, elems);
+      await heapify(i, 0);
    }
 
    return array;
 }
 
-function merge(leftChunk, rightChunk) {
-   const merged = [];
-   let leftIdx = 0;
-   let rightIdx = 0;
+function mergeSort(array, elems) {
+   function mergeIdx(leftChunk, rightChunk) {
+      const merged = [];
+      let leftIdx = 0;
+      let rightIdx = 0;
 
-   while (leftIdx < leftChunk.length && rightIdx < rightChunk.length) {
-      if (leftChunk[leftIdx] < rightChunk[rightIdx]) {
-         merged.push(leftChunk[leftIdx]);
-         leftIdx++;
-      } else {
-         merged.push(rightChunk[rightIdx]);
-         rightIdx++;
+      while (leftIdx < leftChunk.length && rightIdx < rightChunk.length) {
+         if (array[leftChunk[leftIdx]] < array[rightChunk[rightIdx]]) {
+            merged.push(leftChunk[leftIdx]);
+            leftIdx++;
+         } else {
+            merged.push(rightChunk[rightIdx]);
+            rightIdx++;
+         }
       }
+
+      return merged.
+         concat(leftChunk.slice(leftIdx)).
+         concat(rightChunk.slice(rightIdx));
    }
 
-   return merged.
-      concat(leftChunk.slice(leftIdx)).
-      concat(rightChunk.slice(rightIdx));
-}
+   function mergeSortIdx(idxArr) {
+      if (idxArr.length <= 1) return idxArr;
 
-function mergeSort(array) {
-   if (array.length <= 1) return array;
+      const middle = Math.floor(idxArr.length / 2);
 
-   const leftChunk = array.slice(0, Math.floor(array.length / 2));
-   const rightChunk = array.slice(Math.floor(array.length / 2));
+      const leftChunk = idxArr.slice(0, middle);
+      const rightChunk = idxArr.slice(middle);
 
-   return merge(mergeSort(leftChunk), mergeSort(rightChunk));
+      return mergeIdx(mergeSortIdx(leftChunk), mergeSortIdx(rightChunk));
+   }
+
+   const idxArr = array.map((_, idx) => idx);
+   const sortedIdxArr = mergeSortIdx(idxArr);
+
+   return sortedIdxArr.map(idx => array[idx]);
 }
 
 function quickSort(array, startIdx, endIdx) {

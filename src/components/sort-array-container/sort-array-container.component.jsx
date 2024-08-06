@@ -7,8 +7,6 @@ export default function SortArrayContainer({array, refs}) {
       refs.current = refs.current.slice(0, array.length);
    }, [array]);
 
-   console.log(refs);
-
    return (
       <S.SortArrayContainer>
          {
