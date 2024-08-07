@@ -220,9 +220,34 @@ async function selectionSort(array, elems) {
    return array;
 }
 
+async function bubbleSort(array, elems) {
+   for (let i = 0; i < array.length - 1; i++) {
+      let swapped = false;    //USED TO DETERMINE WHETHER OR NOT THE ARRAY IS SORTED (SORTED IF NO SWAPS OCCUR I.E. false)
+
+      for (let j = 0; j < array.length - i - 1; j++) {
+         const jElem = elems[j];
+         const jNextElem = elems[j + 1];
+
+         await highlight(array.length, jElem, jNextElem);
+
+         if (array[j] > array[j + 1]) {
+            swapElems(jElem, jNextElem);
+            
+            [array[j], array[j + 1]] = [array[j + 1], array[j]];
+            swapped = true;
+         }
+      }
+
+      if (!swapped) break;    //ARRAY IS SORTED
+   }
+
+   return array;
+}
+
 export const algorithms = {
    'heapsort': heapSort,
    'mergesort': mergeSort,
    'quicksort': quickSort,
    'selectionsort': selectionSort,
+   'bubblesort': bubbleSort,
 }
