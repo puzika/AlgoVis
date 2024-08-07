@@ -166,8 +166,33 @@ async function mergeSort(array, elems) {
    return sortedIdxArr.map(idx => array[idx]);
 }
 
-function quickSort(array, startIdx, endIdx) {
+async function quickSort(array, elems, startIdx = 0, endIdx = array.length - 1) {
+   if (startIdx >= endIdx) return array;
 
+   let i = startIdx - 1;
+
+   for (let j = startIdx; j <= endIdx; j++) {
+      const jElem = elems[j];
+      const pivotElem = elems[endIdx];
+
+      await highlight(array.length, jElem, pivotElem);
+
+      if (array[j] < array[endIdx] || j === endIdx) {
+         i++;
+
+         const iElem = elems[i];
+
+         await highlight(array.length, iElem, jElem);
+         swapElems(iElem, jElem);
+
+         [array[i], array[j]] = [array[j], array[i]];
+      }
+   }
+
+   await quickSort(array, elems, startIdx, i - 1);
+   await quickSort(array, elems, i + 1, endIdx);
+
+   return array;
 }
 
 export const algorithms = {
