@@ -195,8 +195,34 @@ async function quickSort(array, elems, startIdx = 0, endIdx = array.length - 1) 
    return array;
 }
 
+async function selectionSort(array, elems) {
+   for (let i = 0; i < array.length - 1; i++) {
+      let minIdx = i;
+
+      for (let j = i + 1; j < array.length; j++) {
+         const minElem = elems[minIdx];
+         const jElem = elems[j];
+
+         await highlight(array.length, minElem, jElem);
+
+         if (array[j] < array[minIdx]) minIdx = j;
+      }
+
+      const iElem = elems[i];
+      const minElem = elems[minIdx];
+
+      await highlight(array.length, iElem, minElem);
+      swapElems(minElem, iElem);
+
+      [array[i], array[minIdx]] = [array[minIdx], array[i]];
+   }
+
+   return array;
+}
+
 export const algorithms = {
    'heapsort': heapSort,
    'mergesort': mergeSort,
    'quicksort': quickSort,
+   'selectionsort': selectionSort,
 }
