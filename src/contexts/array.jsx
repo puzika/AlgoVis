@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { algNames } from "../routes/sorting/sorting-algorithm-names";
+import { algNamesSort } from "../routes/sorting/sorting-algorithm-names";
 
 export const ArrayContext = createContext({
    size: 0,
@@ -10,7 +10,7 @@ export const ArrayContext = createContext({
 
 export default function ArrayProvider({children}) {
    const [size, setSize] = useState(50);
-   const [algorithm, setAlgorithm] = useState(algNames.heapsort);
+   const [algorithm, setAlgorithm] = useState(algNamesSort.heapsort);
 
    const value = {size, setSize, algorithm, setAlgorithm};
 

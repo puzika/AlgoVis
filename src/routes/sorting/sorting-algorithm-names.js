@@ -1,4 +1,4 @@
-export const algNames = {
+export const algNamesSort = {
    heapsort: 'Heap Sort',
    mergsort: 'Merge Sort',
    quicksort: 'Quick Sort',

@@ -1,4 +1,3 @@
-import { algNames } from "./sorting-algorithm-names";
 import * as svar from '../../variables.styles';
 
 export const maxVal = 50;

@@ -5,11 +5,11 @@ import Button, { ButtonTypes } from '../../components/button/button.component';
 import Dropdown from '../../components/dropdown/dropdown.component';
 import DropdownItem from '../../components/dropdown-item/dropdown-item.component';
 import RangeSlider from '../../components/range-slider/range-slider.component';
-import AppContainer from '../../components/app-container/app-container.component';
 import SortDataBar from '../../components/sort-data-bar/sort-data-bar.component';
 import SortArrayContainer from '../../components/sort-array-container/sort-array-container.component';
-import { algNames } from './sorting-algorithm-names';
+import { algNamesSort } from './sorting-algorithm-names';
 import { generateRandomArray, algorithms } from './sorting-algorithms';
+import * as S from './sorting.styles';
 
 function formatAlgName(algName) {
    return algName.replace(/\s+/g, '').toLowerCase(); //REMOVE SPACES AND CONVERT ALL UPPERCASE LETTERS TO LOWECASE ("Heap Sort => heapsort")
@@ -42,7 +42,7 @@ export default function Sorting() {
          <Toolbar>
             <Dropdown name={'Algorithms'}>
                {
-                  Object.values(algNames).map(alg => (
+                  Object.values(algNamesSort).map(alg => (
                      <DropdownItem clickHandler={() => setAlgorithm(alg)} key={alg} name={alg} />
                   ))
                }
@@ -51,10 +51,10 @@ export default function Sorting() {
             <Button clickHandler={handleGenerate} name={'Generate array'} styleType={ButtonTypes.filled} />
             <Button clickHandler={handleSort} name={'Sort'} styleType={ButtonTypes.transparent} />
          </Toolbar>
-         <AppContainer>
+         <S.AppContainer>
             <SortDataBar algorithm={algorithm} size={size} />
             <SortArrayContainer refs={barRefs} array={array} />
-         </AppContainer>
+         </S.AppContainer>
       </>
    )
 }

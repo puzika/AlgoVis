@@ -7,6 +7,8 @@ export const DropdownContainer = styled.ul`
    left: 50%;
    translate: -50% .5rem;
    min-width: 100%;
+   max-width: 25rem;
+   width: max-content;
    background-color: ${svar.colorBaseLight};
    border-radius: 2rem;
    visibility: hidden;
