@@ -10,7 +10,6 @@ import SortDataBar from '../../components/sort-data-bar/sort-data-bar.component'
 import SortArrayContainer from '../../components/sort-array-container/sort-array-container.component';
 import { algNames } from './sorting-algorithm-names';
 import { generateRandomArray, algorithms } from './sorting-algorithms';
-import * as S from './sorting.styles';
 
 function formatAlgName(algName) {
    return algName.replace(/\s+/g, '').toLowerCase(); //REMOVE SPACES AND CONVERT ALL UPPERCASE LETTERS TO LOWECASE ("Heap Sort => heapsort")
