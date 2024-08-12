@@ -1,16 +1,16 @@
 import * as S from './pathfinding-grid.styles';
-import { gridWidth, gridHeight } from '../../routes/pathfinding/pathfinding-algorithms';
+import { gridWidth } from '../../routes/pathfinding/pathfinding-algorithms';
 
-export default function Grid() {
-   const cells = [];
-
-   for (let i = 0; i < gridWidth * gridHeight; i++) cells.push(i);
+export default function Grid({grid, refs}) {
+   const [rows, cols] = [grid.length, grid[0].length];
 
    return (
       <S.Grid $width={gridWidth} >
          {
-            cells.map((i) => (
-               <S.GridCell key={i}></S.GridCell>
+            grid.map((row, i) => (
+               row.map((_, j) => (
+                  <S.GridCell ref={element => refs.current[j + i * cols] = element} key={j + i * cols}></S.GridCell>
+               )) 
             ))
          }
       </S.Grid>

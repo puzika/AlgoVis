@@ -2,8 +2,6 @@ import styled from "styled-components";
 import * as svar from '../../variables.styles';
 
 export const Grid = styled.div`
-   margin: 5rem auto;
-   width: 90%;
    display: grid;
    grid-template-columns: repeat(${({$width}) => $width}, 1fr);
    border: .1rem solid ${svar.colorPrimaryLighter};

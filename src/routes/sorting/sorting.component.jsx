@@ -5,7 +5,7 @@ import Button, { ButtonTypes } from '../../components/button/button.component';
 import Dropdown from '../../components/dropdown/dropdown.component';
 import DropdownItem from '../../components/dropdown-item/dropdown-item.component';
 import RangeSlider from '../../components/range-slider/range-slider.component';
-import SortDataBar from '../../components/sort-data-bar/sort-data-bar.component';
+import DataBar from '../../components/data-bar/data-bar.component';
 import SortArrayContainer from '../../components/sort-array-container/sort-array-container.component';
 import { algNamesSort } from './sorting-algorithm-names';
 import { generateRandomArray, sortAlgorithms } from './sorting-algorithms';
@@ -52,7 +52,7 @@ export default function Sorting() {
             <Button clickHandler={handleSort} name={'Sort'} styleType={ButtonTypes.transparent} />
          </Toolbar>
          <S.AppContainer>
-            <SortDataBar algorithm={algorithm} size={size} />
+            <DataBar algorithm={algorithm} extraInfo={`Size: ${size}`} />
             <SortArrayContainer refs={barRefs} array={array} />
          </S.AppContainer>
       </>

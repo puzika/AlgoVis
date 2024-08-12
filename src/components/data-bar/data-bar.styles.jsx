@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const SortDataBar = styled.div`
+export const DataBar = styled.div`
    display: flex;
    align-items: center;
    justify-content: space-between;
