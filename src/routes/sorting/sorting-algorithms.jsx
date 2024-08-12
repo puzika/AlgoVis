@@ -243,7 +243,7 @@ async function bubbleSort(array, elems) {
    return array;
 }
 
-export const algorithms = {
+export const sortAlgorithms = {
    'heapsort': heapSort,
    'mergesort': mergeSort,
    'quicksort': quickSort,

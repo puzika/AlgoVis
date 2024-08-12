@@ -4,6 +4,7 @@ export const algNamesPathfinding = {
 }
 
 export const algNamesMaze = {
-   recursivedivision: 'Recursive Division',
+   backtracking: 'Backtracking',
    huntandkill: 'Hunt and Kill',
+   recursivedivision: 'Recursive Division',
 }

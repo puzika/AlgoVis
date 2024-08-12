@@ -20,14 +20,14 @@ export default function Pathfinding() {
             <Dropdown name={'Algorithms'}>
                {
                   Object.values(algNamesPathfinding).map(alg => (
-                     <DropdownItem clickHandler={() => setAlgorithm(alg)} key={alg} name={alg} />
+                     <DropdownItem clickHandler={() => {}} key={alg} name={alg} />
                   ))
                }
             </Dropdown>
             <Dropdown name={'Mazes'}>
                {
                   Object.values(algNamesMaze).map(alg => (
-                     <DropdownItem clickHandler={() => setAlgorithm(alg)} key={alg} name={alg} />
+                     <DropdownItem clickHandler={() => {}} key={alg} name={alg} />
                   ))
                }
             </Dropdown>

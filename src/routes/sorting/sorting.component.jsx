@@ -1,5 +1,5 @@
 import { useContext, useState, useRef } from 'react';
-import { ArrayContext } from '../../contexts/array';
+import { SortingContext } from '../../contexts/sorting';
 import Toolbar from '../../components/toolbar/toolbar.component';
 import Button, { ButtonTypes } from '../../components/button/button.component';
 import Dropdown from '../../components/dropdown/dropdown.component';
@@ -8,7 +8,7 @@ import RangeSlider from '../../components/range-slider/range-slider.component';
 import SortDataBar from '../../components/sort-data-bar/sort-data-bar.component';
 import SortArrayContainer from '../../components/sort-array-container/sort-array-container.component';
 import { algNamesSort } from './sorting-algorithm-names';
-import { generateRandomArray, algorithms } from './sorting-algorithms';
+import { generateRandomArray, sortAlgorithms } from './sorting-algorithms';
 import * as S from './sorting.styles';
 
 function formatAlgName(algName) {
@@ -16,7 +16,7 @@ function formatAlgName(algName) {
 }
 
 export default function Sorting() {
-   const {size, setSize, algorithm, setAlgorithm} = useContext(ArrayContext);
+   const {size, setSize, algorithm, setAlgorithm} = useContext(SortingContext);
    const [array, setArray] = useState(generateRandomArray(size));
    const barRefs = useRef([]);
 
@@ -33,7 +33,7 @@ export default function Sorting() {
 
    async function handleSort() {
       const algName = formatAlgName(algorithm);
-      const sortedArray = await algorithms[algName]([...array], barRefs.current);
+      const sortedArray = await sortAlgorithms[algName]([...array], barRefs.current);
       setArray(sortedArray);
    }
 
