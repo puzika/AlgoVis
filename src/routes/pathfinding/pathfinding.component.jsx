@@ -7,25 +7,35 @@ import DropdownItem from '../../components/dropdown-item/dropdown-item.component
 import Grid from "../../components/pathfinding-grid/pathfinding-grid.component";
 import DataBar from "../../components/data-bar/data-bar.component";
 import { algNamesPathfinding, algNamesMaze } from "./pathfinding-algorithm-names";
-import { generateEmptyGrid } from './pathfinding-algorithms';
+import { generateEmptyGrid, clearGrid, pathfindingAlgorithms, mazeAlgorithms } from './pathfinding-algorithms';
+import _ from 'lodash';
 import * as S from './pathfinding.styles';
+
+function formatAlgName(algName) {
+   return algName.replace(/[^A-Z0-9]+/ig, '').toLowerCase(); //REMOVE SPECIAL CHARACTERS AND CONVERT ALL UPPERCASE LETTERS TO LOWECASE ("Breadth-First Search => breadthfirstsearch")
+}
 
 export default function Pathfinding() {
    const {mazeAlgorithm, pathfindingAlgorithm, setMazeAlgorithm, setPathfindingAlgorithm} = useContext(PathfindingContext);
    const [grid, setGrid] = useState(generateEmptyGrid());
    const cellRefs = useRef([]);
 
-   function handleGenerate() {
-
+   function handleGenerateMaze() {
+      const algName = formatAlgName(mazeAlgorithm);
+      const clone = _.cloneDeep(grid);
+      mazeAlgorithms[algName](clone, cellRefs.current);
    }
 
    function handleClearGrid() {
       const emptyGrid = generateEmptyGrid();
+      clearGrid(cellRefs.current);
       setGrid(emptyGrid);
    }
 
    function handleFindPath() {
-
+      const algName = formatAlgName(pathfindingAlgorithm);
+      const clone = _.cloneDeep(grid);
+      pathfindingAlgorithms[algName](clone, cellRefs.current);
    }
 
    return (
@@ -45,7 +55,7 @@ export default function Pathfinding() {
                   ))
                }
             </Dropdown>
-            <Button clickHandler={handleGenerate} name={'Generate maze'} styleType={ButtonTypes.filled} />
+            <Button clickHandler={handleGenerateMaze} name={'Generate maze'} styleType={ButtonTypes.filled} />
             <Button clickHandler={handleClearGrid} name={'Clear grid'} styleType={ButtonTypes.filled} />
             <Button clickHandler={handleFindPath} name={'Find path'} styleType={ButtonTypes.transparent} />
          </Toolbar>

@@ -1,5 +1,5 @@
 export const algNamesPathfinding = {
-   breadthfirstsearch: 'Breadth First Search',
+   breadthfirstsearch: 'Breadth-First Search',
    dijkstrasalgorithm: "Dijkstra's Algorithm",
 }
 

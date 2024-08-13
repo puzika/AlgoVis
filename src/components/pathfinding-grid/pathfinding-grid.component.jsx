@@ -1,5 +1,5 @@
-import * as S from './pathfinding-grid.styles';
 import { gridWidth } from '../../routes/pathfinding/pathfinding-algorithms';
+import * as S from './pathfinding-grid.styles';
 
 export default function Grid({grid, refs}) {
    const [rows, cols] = [grid.length, grid[0].length];

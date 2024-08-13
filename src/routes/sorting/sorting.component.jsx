@@ -12,7 +12,7 @@ import { generateRandomArray, sortAlgorithms } from './sorting-algorithms';
 import * as S from './sorting.styles';
 
 function formatAlgName(algName) {
-   return algName.replace(/\s+/g, '').toLowerCase(); //REMOVE SPACES AND CONVERT ALL UPPERCASE LETTERS TO LOWECASE ("Heap Sort => heapsort")
+   return algName.replace(/[^A-Z0-9]+/ig, '').toLowerCase(); //REMOVE SPECIAL CHARACTERS AND CONVERT ALL UPPERCASE LETTERS TO LOWECASE ("Heap Sort => heapsort")
 }
 
 export default function Sorting() {
