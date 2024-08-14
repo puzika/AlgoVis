@@ -20,10 +20,11 @@ export default function Pathfinding() {
    const [grid, setGrid] = useState(generateEmptyGrid());
    const cellRefs = useRef([]);
 
-   function handleGenerateMaze() {
+   async function handleGenerateMaze() {
       const algName = formatAlgName(mazeAlgorithm);
       const clone = _.cloneDeep(grid);
-      mazeAlgorithms[algName](clone, cellRefs.current);
+      const newGrid = await mazeAlgorithms[algName](clone, cellRefs.current);
+      setGrid(newGrid);
    }
 
    function handleClearGrid() {
@@ -32,10 +33,11 @@ export default function Pathfinding() {
       setGrid(emptyGrid);
    }
 
-   function handleFindPath() {
+   async function handleFindPath() {
       const algName = formatAlgName(pathfindingAlgorithm);
       const clone = _.cloneDeep(grid);
-      pathfindingAlgorithms[algName](clone, cellRefs.current);
+      const newGrid = await pathfindingAlgorithms[algName](clone, cellRefs.current);
+      setGrid(newGrid);
    }
 
    return (

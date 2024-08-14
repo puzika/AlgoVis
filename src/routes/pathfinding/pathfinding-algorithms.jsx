@@ -1,7 +1,9 @@
 import * as svar from '../../variables.styles';
 
-export const gridWidth = 50;
-export const gridHeight = 20;
+//BOTH GRIDWIDTH AND GRIDHEIGHT MUST BE ODD
+
+export const gridWidth = 65;
+export const gridHeight = 25;
 
 export function generateEmptyGrid() {
    const grid = [];
@@ -25,7 +27,7 @@ export function clearGrid(elems) {
 
 function delay() {
    return new Promise((resolve) => {
-      setTimeout(resolve, 50);
+      setTimeout(resolve, 25);
    })
 }
 
@@ -37,40 +39,76 @@ function addWall(elem) {
    elem.style.backgroundColor = `${svar.colorPrimary}`;
 }
 
-async function createBorders(grid, elems) {
-   for (let i = 0; i < gridWidth; i++) {
-      grid[0][i] = '#';
-      grid[gridHeight - 1][gridWidth - i - 1] = '#';
+function removeWall(elem) {
+   elem.style.backgroundColor = 'transparent';
+}
 
-      const firstRowElem = elems[i];
-      const lastRowElem = elems[elems.length - i - 1];
-
-      addWall(firstRowElem);
-      addWall(lastRowElem);
-      await delay();
+function shuffle(arr) {
+   for (let i = arr.length - 1; i > 0; i--) {
+      const randIdx = Math.floor(Math.random() * (i + 1));
+      [arr[randIdx], arr[i]] = [arr[i], arr[randIdx]];
    }
+}
 
-   for (let i = 1; i < gridHeight; i++) {
-      grid[i][0] = '#';
-      grid[gridHeight - i - 1][gridWidth - 1] = '#';
-
-      const firstColElem = elems[i * gridWidth];
-      const lastColElem = elems[elems.length - i * gridWidth - 1];
-
-      addWall(firstColElem);
-      addWall(lastColElem);
-      await delay();
+function fillWithWalls(grid, elems) {
+   elems.forEach(elem => addWall(elem));
+   
+   for (let i = 0; i < gridHeight; i++) {
+      for (let j = 0; j < gridWidth; j++) {
+         grid[i][j] = '#';
+      }
    }
 } 
 
 async function backtracking(grid, elems) {
-   createBorders(grid, elems);
+   fillWithWalls(grid, elems);
+   const dirs = [[-2, 0], [0, 2], [2, 0], [0, -2]];
 
+   async function backtrack(currY = 1, currX = 1) {   //START AT [1, 1], BECAUSE THE GRID IS SURROUNDED BY WALLS
+      const currPosition = getPosition(currY, currX);
+      const currElem = elems[currPosition];
+      
+      grid[currY][currX] = '';
+      removeWall(currElem);
 
+      await delay();
+
+      shuffle(dirs);
+
+      for (const dir of dirs) {
+         const [dy, dx] = dir;
+         const [nextY, nextX] = [currY + dy, currX + dx];
+
+         if (
+            nextY >= 0 &&
+            nextY < gridHeight &&
+            nextX >= 0 &&
+            nextX < gridWidth &&
+            grid[nextY][nextX] !== ''
+         ) {
+            const [midY, midX] = [currY + dy / 2, currX + dx / 2];
+            const midPosition = getPosition(midY, midX);
+            const midCell = elems[midPosition];
+            
+            grid[midY][midX] = '';
+            removeWall(midCell);
+
+            await delay();
+
+            await backtrack(nextY, nextX);
+         }
+      }
+   }
+
+   await backtrack();
+
+   console.log('done');
+
+   return grid;
 }
 
 async function huntAndKill(grid, elems) {
-   createBorders(grid, elems);
+   fillWithWalls(grid, elems);
 }
 
 function breadthFirstSearch(grid, elems) {
