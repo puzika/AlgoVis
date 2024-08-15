@@ -27,7 +27,7 @@ export function clearGrid(elems) {
 
 function delay() {
    return new Promise((resolve) => {
-      setTimeout(resolve, 25);
+      setTimeout(resolve, 20);
    })
 }
 
@@ -63,13 +63,14 @@ function fillWithWalls(grid, elems) {
 async function backtracking(grid, elems) {
    fillWithWalls(grid, elems);
    const dirs = [[-2, 0], [0, 2], [2, 0], [0, -2]];
-
-   async function backtrack(currY = 1, currX = 1) {   //START AT [1, 1], BECAUSE THE GRID IS SURROUNDED BY WALLS
-      const currPosition = getPosition(currY, currX);
-      const currElem = elems[currPosition];
-      
+   
+   async function backtrack(currY = 1, currX = 1) {
       grid[currY][currX] = '';
-      removeWall(currElem);
+
+      const currPosition = getPosition(currY, currX);
+      const currCell = elems[currPosition];
+
+      removeWall(currCell);
 
       await delay();
 
@@ -80,16 +81,16 @@ async function backtracking(grid, elems) {
          const [nextY, nextX] = [currY + dy, currX + dx];
 
          if (
-            nextY >= 0 &&
-            nextY < gridHeight &&
             nextX >= 0 &&
             nextX < gridWidth &&
+            nextY >= 0 &&
+            nextY < gridHeight &&
             grid[nextY][nextX] !== ''
          ) {
             const [midY, midX] = [currY + dy / 2, currX + dx / 2];
             const midPosition = getPosition(midY, midX);
             const midCell = elems[midPosition];
-            
+
             grid[midY][midX] = '';
             removeWall(midCell);
 
@@ -109,6 +110,89 @@ async function backtracking(grid, elems) {
 
 async function huntAndKill(grid, elems) {
    fillWithWalls(grid, elems);
+   const dirs = [[-2, 0], [0, 2], [2, 0], [0, -2]];
+   
+   const hunt = () => {
+      for (let i = 1; i < gridHeight; i += 2) {
+         for (let j = 1; j < gridWidth; j += 2) {
+            if (grid[i][j] === '') {
+               for (const dir of dirs) {
+                  const [dy, dx] = dir;
+                  const [nextY, nextX] = [i + dy, j + dx];
+
+                  if (
+                     nextX >= 0 &&
+                     nextX < gridWidth &&
+                     nextY >= 0 &&
+                     nextY < gridHeight &&
+                     grid[nextY][nextX] !== ''
+                  ) return [i, j];
+               }
+            }
+         }
+      }
+
+      return [];  //ALL CELLS HAVE BEEN VISITED
+   }
+
+   grid[1][1] = '';
+
+   let currCell = [1, 1];
+   const startPosition = getPosition(1, 1);
+   const startCellElem = elems[startPosition];
+   
+   removeWall(startCellElem);
+
+   await delay();
+
+   while (currCell.length > 0) {
+      shuffle(dirs);
+      
+      let nextCell;
+      const [currY, currX] = currCell;
+      
+      for (const dir of dirs) {
+         const [dy, dx] = dir;
+         const [nextY, nextX] = [currY + dy, currX + dx];
+         
+         if (
+            nextX >= 0 &&
+            nextX < gridWidth &&
+            nextY >= 0 &&
+            nextY < gridHeight &&
+            grid[nextY][nextX] !== ''
+         ) nextCell = [nextY, nextX];
+
+         if (nextCell) {
+            const [midY, midX] = [currY + dy / 2, currX + dx / 2];
+            const nextPosition = getPosition(nextY, nextX);
+            const midPosition = getPosition(midY, midX);
+            const nextCellElem = elems[nextPosition];
+            const midCellElem = elems[midPosition];
+
+            grid[nextY][nextX] = '';
+            grid[midY][midX] = '';
+
+            removeWall(midCellElem);
+
+            await delay();
+            
+            removeWall(nextCellElem);
+
+            await delay();
+
+            currCell = nextCell;
+
+            break;
+         }
+      }
+
+      if (!nextCell) currCell = hunt();
+   }
+
+   console.log('done');
+
+   return grid;
 }
 
 function breadthFirstSearch(grid, elems) {

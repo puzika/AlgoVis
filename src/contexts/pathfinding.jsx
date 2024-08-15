@@ -9,7 +9,7 @@ export const PathfindingContext = createContext({
 });
 
 export default function PathfindingProvider({children}) {
-   const [mazeAlgorithm, setMazeAlgorithm] = useState(algNamesMaze.backtracking);
+   const [mazeAlgorithm, setMazeAlgorithm] = useState(algNamesMaze.huntandkill);
    const [pathfindingAlgorithm, setPathfindingAlgorithm] = useState(algNamesPathfinding.breadthfirstsearch);
 
    const value = {
