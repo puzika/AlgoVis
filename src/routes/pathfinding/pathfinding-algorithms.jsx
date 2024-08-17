@@ -1,3 +1,4 @@
+import { get } from 'lodash';
 import * as svar from '../../variables.styles';
 
 //BOTH GRIDWIDTH AND GRIDHEIGHT MUST BE ODD
@@ -27,7 +28,7 @@ export function clearGrid(elems) {
 
 function delay() {
    return new Promise((resolve) => {
-      setTimeout(resolve, 20);
+      setTimeout(resolve, 10);
    })
 }
 
@@ -60,49 +61,87 @@ function fillWithWalls(grid, elems) {
    }
 } 
 
+function isValidCell(grid, nextY, nextX) {
+   return (
+      nextY >= 0 &&
+      nextY < gridHeight &&
+      nextX >= 0 &&
+      nextX < gridWidth &&
+      grid[nextY][nextX] !== ''
+   );
+}
+
 async function backtracking(grid, elems) {
    fillWithWalls(grid, elems);
    const dirs = [[-2, 0], [0, 2], [2, 0], [0, -2]];
    
-   async function backtrack(currY = 1, currX = 1) {
-      grid[currY][currX] = '';
+   let currCell = [1, 1];
+   const stack = [currCell];
+   
+   let [currY, currX] = currCell;
 
-      const currPosition = getPosition(currY, currX);
-      const currCell = elems[currPosition];
+   grid[currY][currX] = '';
 
-      removeWall(currCell);
+   const firstPosition = getPosition(currY, currX);
+   const firstElem = elems[firstPosition];
 
-      await delay();
+   removeWall(firstElem);
 
-      shuffle(dirs);
+   await delay();
 
-      for (const dir of dirs) {
-         const [dy, dx] = dir;
-         const [nextY, nextX] = [currY + dy, currX + dx];
+   while (stack.length > 0) {
+      if (currCell.length === 0) {
+         const [lastY, lastX] = stack.pop();
 
-         if (
-            nextX >= 0 &&
-            nextX < gridWidth &&
-            nextY >= 0 &&
-            nextY < gridHeight &&
-            grid[nextY][nextX] !== ''
-         ) {
-            const [midY, midX] = [currY + dy / 2, currX + dx / 2];
-            const midPosition = getPosition(midY, midX);
-            const midCell = elems[midPosition];
-
-            grid[midY][midX] = '';
-            removeWall(midCell);
-
-            await delay();
-
-            await backtrack(nextY, nextX);
+         for (const dir of dirs) {
+            const [dy, dx] = dir;
+            const [nextY, nextX] = [lastY + dy, lastX + dx];
+            
+            if (isValidCell(grid, nextY, nextX)) currCell = [lastY, lastX];
          }
+      } else {
+         shuffle(dirs);
+
+         let nextCell;
+         [currY, currX] = currCell;
+
+         for (const dir of dirs) {
+            const [dy, dx] = dir;
+            const [nextY, nextX] = [currY + dy, currX + dx];
+            
+            if (isValidCell(grid, nextY, nextX)) {
+               const [midY, midX] = [currY + dy / 2, currX + dx / 2];
+               const midPosition = getPosition(midY, midX);
+               const nextPosition = getPosition(nextY, nextX);
+               const midElem = elems[midPosition];
+               const nextElem = elems[nextPosition];
+
+               grid[midY][midX] = '';
+               grid[nextY][nextX] = '';
+
+               removeWall(midElem);
+
+               await delay();
+
+               removeWall(nextElem);
+
+               await delay();
+
+               nextCell = [nextY, nextX];
+
+               stack.push(nextCell);
+
+               break;
+            }
+         }
+
+         if (!nextCell) {
+            stack.pop();
+            currCell = [];
+         } else currCell = nextCell;
       }
    }
-
-   await backtrack();
-
+   
    console.log('done');
 
    return grid;
@@ -111,7 +150,7 @@ async function backtracking(grid, elems) {
 async function huntAndKill(grid, elems) {
    fillWithWalls(grid, elems);
    const dirs = [[-2, 0], [0, 2], [2, 0], [0, -2]];
-   
+
    const hunt = () => {
       for (let i = 1; i < gridHeight; i += 2) {
          for (let j = 1; j < gridWidth; j += 2) {
@@ -120,74 +159,62 @@ async function huntAndKill(grid, elems) {
                   const [dy, dx] = dir;
                   const [nextY, nextX] = [i + dy, j + dx];
 
-                  if (
-                     nextX >= 0 &&
-                     nextX < gridWidth &&
-                     nextY >= 0 &&
-                     nextY < gridHeight &&
-                     grid[nextY][nextX] !== ''
-                  ) return [i, j];
+                  if (isValidCell(grid, nextY, nextX)) return [i, j];
                }
             }
          }
       }
 
-      return [];  //ALL CELLS HAVE BEEN VISITED
+      return [];  //NO UNVISITED CELL FOUND
    }
 
-   grid[1][1] = '';
-
-   let currCell = [1, 1];
-   const startPosition = getPosition(1, 1);
-   const startCellElem = elems[startPosition];
+   grid[1][1] = '';  //MARK FIRST CELL AS VISITED
    
-   removeWall(startCellElem);
+   let currentCell = [1, 1];
+   const firstElemPosition = getPosition(1, 1);
+   const firstElem = elems[firstElemPosition];
+
+   removeWall(firstElem);
 
    await delay();
 
-   while (currCell.length > 0) {
+   while (currentCell.length > 0) {
       shuffle(dirs);
-      
+
+      const [currY, currX] = currentCell;
       let nextCell;
-      const [currY, currX] = currCell;
-      
+
       for (const dir of dirs) {
          const [dy, dx] = dir;
          const [nextY, nextX] = [currY + dy, currX + dx];
-         
-         if (
-            nextX >= 0 &&
-            nextX < gridWidth &&
-            nextY >= 0 &&
-            nextY < gridHeight &&
-            grid[nextY][nextX] !== ''
-         ) nextCell = [nextY, nextX];
+
+         if (isValidCell(grid, nextY, nextX)) nextCell = [nextY, nextX];
 
          if (nextCell) {
             const [midY, midX] = [currY + dy / 2, currX + dx / 2];
-            const nextPosition = getPosition(nextY, nextX);
-            const midPosition = getPosition(midY, midX);
-            const nextCellElem = elems[nextPosition];
-            const midCellElem = elems[midPosition];
+            const midElemPosition = getPosition(midY, midX);
+            const nextElemPosition = getPosition(nextY, nextX);
+            const midElem = elems[midElemPosition];
+            const nextElem = elems[nextElemPosition];
 
-            grid[nextY][nextX] = '';
             grid[midY][midX] = '';
+            grid[nextY][nextX] = '';
 
-            removeWall(midCellElem);
+            removeWall(midElem);
 
             await delay();
             
-            removeWall(nextCellElem);
+            removeWall(nextElem);
 
             await delay();
 
-            currCell = nextCell;
+            currentCell = nextCell;
 
             break;
          }
       }
 
-      if (!nextCell) currCell = hunt();
+      if (!nextCell) currentCell = hunt();
    }
 
    console.log('done');
