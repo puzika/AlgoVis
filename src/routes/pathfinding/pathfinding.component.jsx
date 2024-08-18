@@ -63,7 +63,7 @@ export default function Pathfinding() {
          </Toolbar>
          <S.AppContainer>
             <DataBar algorithm={pathfindingAlgorithm} extraInfo={`Maze: ${mazeAlgorithm}`} />
-            <Grid refs={cellRefs} grid={grid} />
+            <Grid refs={cellRefs} grid={grid} start={[2, 2]} dest={[grid.length - 2, grid[0].length - 2]} />
          </S.AppContainer>
       </>
    )

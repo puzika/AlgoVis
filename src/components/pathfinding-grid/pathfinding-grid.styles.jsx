@@ -10,5 +10,10 @@ export const Grid = styled.div`
 export const GridCell = styled.div`
    aspect-ratio: 1;
    border: inherit;
-   transition: background-color .25s;
-`
+   transition: all .25s;
+`;
+
+export const GridCellImg = styled.img`
+   display: block;
+   width: 100%;
+`;
