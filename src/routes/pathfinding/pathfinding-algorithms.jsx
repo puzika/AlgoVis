@@ -222,12 +222,110 @@ async function huntAndKill(grid, elems) {
    return grid;
 }
 
-function breadthFirstSearch(grid, elems) {
-   console.log('bfs', elems);
+async function reconstructPath(path, elems) {
+   for (const cell of path) {
+      const position = getPosition(...cell);
+      const cellElem = elems[position];
+
+      await delay();
+
+      cellElem.style.backgroundColor = 'yellow';
+   }
 }
 
-function dijkstrasAlgorithm(grid, elems) {
+function clearVisitedCells(visited, elems) {
+   for (const cell of visited) {
+      const cellPosition = getPosition(...cell);
+      const cellElem = elems[cellPosition];
+
+      cellElem.style.boxShadow = 'none';
+   }
+}
+
+function clearPath(grid, elems) {
+   const [rows, cols] = [grid.length, grid[0].length];
+
+   for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+         if (grid[i][j] === '#') continue;
+
+         const cellPosition = getPosition(i, j);
+         const cellElem = elems[cellPosition];
+
+         cellElem.style.backgroundColor = 'transparent';
+      }
+   }
+}
+
+async function breadthFirstSearch(grid, startCoords, endCoords, elems) {
+   const [rows, cols] = [grid.length, grid[0].length];
+   const visited = new Map();
+   const prev = new Array(rows * cols).fill(null);
+   const dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+   const queue = [startCoords];
+   const path = [];
+
+   clearPath(grid, elems);    //CLEAR PREVIOUSLY ANIMATED PATH
+
+   const startPosition = getPosition(...startCoords);
+   const endPosition = getPosition(...endCoords);
+
+   while (queue.length > 0) {
+      const [currY, currX] = queue.shift();
+      const currPosition = getPosition(currY, currX);
+
+      if (visited.has(currPosition)) continue;
+      else visited.set(currPosition, [currY, currX]);
+
+      const currElem = elems[currPosition];
+
+      currElem.style.boxShadow = `inset 0 0 .5rem .5rem aliceblue`;
+
+      await delay();
+
+      if (currPosition === endPosition) break;
+
+      for (const dir of dirs) {
+         const [dy, dx] = dir;
+         const [nextY, nextX] = [currY + dy, currX + dx];
+         const nextPosition = getPosition(nextY, nextX);
+
+         if (
+            nextY >= 0 &&
+            nextY < rows &&
+            nextX >= 0 &&
+            nextX < cols &&
+            !visited.has(nextPosition) &&
+            grid[nextY][nextX] !== '#'
+         ) {
+            queue.push([nextY, nextX]);
+            prev[nextPosition] = [currY, currX];
+         }
+      }
+   }
+
+   let currPosition = endPosition;
+   let currCell = prev[currPosition];
+
+   while (currCell && currPosition !== startPosition) {
+      path.push(currCell);
+      currPosition = getPosition(...currCell);
+      currCell = prev[currPosition];
+   }
+
+   path.unshift(endCoords);
+
+   clearVisitedCells([...visited.values()], elems);
+
+   reconstructPath(path, elems);
+
+   return grid;
+}
+
+function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
    console.log('Dijkstra', elems);
+
+   return grid;
 }
 
 export const mazeAlgorithms = {
