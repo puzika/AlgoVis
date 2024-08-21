@@ -6,6 +6,61 @@ import * as svar from '../../variables.styles';
 export const gridWidth = 65;
 export const gridHeight = 25;
 
+class PriorityQueue {
+   constructor() {
+      this.queue = [];
+   }
+
+   bubbleUp(idx) {
+      while (idx > 0) {
+         const parentIdx = Math.floor((idx - 1) / 2);
+
+         if (this.queue[parentIdx][1] <= this.queue[idx][1]) break;
+
+         [this.queue[parentIdx], this.queue[idx]] = [this.queue[idx], this.queue[parentIdx]];
+
+         idx = parentIdx;
+      }
+   }
+
+   sinkDown(idx) {
+      let smallest = idx;
+      const left = 2 * idx + 1;
+      const right = 2 * idx + 2;
+
+      if (left < this.size && this.queue[left][1] < this.queue[smallest][1]) smallest = left; 
+      if (right < this.size && this.queue[right][1] < this.queue[smallest][1]) smallest = right; 
+
+      if (smallest !== idx) {
+         [this.queue[idx], this.queue[smallest]] = [this.queue[smallest], this.queue[idx]];
+         this.sinkDown(smallest);
+      }
+   }
+
+   enqueue(val) {
+      this.queue.push(val);
+      this.bubbleUp(this.size - 1);
+   }
+
+   dequeue() {
+      if (this.size === 0) return null;
+
+      const min = this.queue[0];
+      const last = this.queue.pop();
+
+      if (this.size > 0) {
+         this.queue[0] = last;
+         this.sinkDown(0);
+      }
+
+      return min;
+   }
+
+   get size() {
+      return this.queue.length;
+   }
+}
+
 export function generateEmptyGrid() {
    const grid = [];
 
@@ -141,8 +196,6 @@ async function backtracking(grid, elems) {
          } else currCell = nextCell;
       }
    }
-   
-   console.log('done');
 
    return grid;
 }
@@ -217,12 +270,12 @@ async function huntAndKill(grid, elems) {
       if (!nextCell) currentCell = hunt();
    }
 
-   console.log('done');
-
    return grid;
 }
 
 async function reconstructPath(path, elems) {
+   path.reverse();
+
    for (const cell of path) {
       const position = getPosition(...cell);
       const cellElem = elems[position];
@@ -257,6 +310,10 @@ function clearPath(grid, elems) {
    }
 }
 
+function visitCell(cell) {
+   cell.style.boxShadow = 'inset 0 0 .5rem .5rem aliceblue';
+}
+
 async function breadthFirstSearch(grid, startCoords, endCoords, elems) {
    const [rows, cols] = [grid.length, grid[0].length];
    const visited = new Map();
@@ -279,7 +336,7 @@ async function breadthFirstSearch(grid, startCoords, endCoords, elems) {
 
       const currElem = elems[currPosition];
 
-      currElem.style.boxShadow = `inset 0 0 .5rem .5rem aliceblue`;
+      visitCell(currElem);
 
       await delay();
 
@@ -322,8 +379,75 @@ async function breadthFirstSearch(grid, startCoords, endCoords, elems) {
    return grid;
 }
 
-function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
-   console.log('Dijkstra', elems);
+async function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
+   const [rows, cols] = [grid.length, grid[0].length];
+   const visited = new Map();
+   const queue = new PriorityQueue();
+   const dist = new Array(rows * cols).fill(Infinity);
+   const prev = new Array(rows * cols).fill(null);
+   const dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+   const path = [];
+
+   const startPosition = getPosition(...startCoords);
+   const endPosition = getPosition(...endCoords);
+
+   clearPath(grid, elems);    //CLEAR PREVIOUSLY ANIMATED PATH
+
+   dist[startPosition] = 0;
+   queue.enqueue([startCoords, 0]);
+
+   while (queue.size > 0) {
+      const [currCell, currDist] = queue.dequeue();
+      const [currY, currX] = currCell;
+      const currPosition = getPosition(currY, currX);
+
+      if (currPosition === endPosition) break;
+
+      if (visited.has(currPosition) || currDist > dist[currPosition]) continue;
+
+      visited.set(currPosition, currCell);
+      
+      const currElem = elems[currPosition];
+
+      visitCell(currElem);
+
+      await delay();
+
+      for (const [dy, dx] of dirs) {
+         const [nextY, nextX] = [currY + dy, currX + dx];
+         const nextPosition = getPosition(nextY, nextX);
+         const newDist = currDist + 1;
+
+         if (
+            nextY >= 0 &&
+            nextY < rows &&
+            nextX >= 0 &&
+            nextX < cols &&
+            grid[nextY][nextX] !== '#' &&
+            !visited.has(nextPosition) &&
+            dist[nextPosition] > newDist
+         ) {
+            dist[nextPosition] = newDist;
+            queue.enqueue([[nextY, nextX], newDist]);
+            prev[nextPosition] = currCell;
+         }
+      }
+   }
+
+   let currPosition = endPosition;
+   let currCell = prev[currPosition];
+
+   while (currCell && currPosition !== startPosition) {
+      path.push(currCell);
+      currPosition = getPosition(...currCell);
+      currCell = prev[currPosition];
+   }
+
+   path.unshift(endCoords);
+
+   clearVisitedCells([...visited.values()], elems);
+
+   reconstructPath(path, elems);
 
    return grid;
 }
@@ -335,5 +459,5 @@ export const mazeAlgorithms = {
 
 export const pathfindingAlgorithms = {
    'breadthfirstsearch': breadthFirstSearch,
-   'dijsktrasalgorithm': dijkstrasAlgorithm,
+   'dijkstrasalgorithm': dijkstrasAlgorithm,
 };
