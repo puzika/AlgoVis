@@ -273,6 +273,30 @@ async function huntAndKill(grid, elems) {
    return grid;
 }
 
+async function basicRandom(grid, elems) {
+   grid = generateEmptyGrid();
+   clearGrid(elems);
+
+   const [rows, cols] = [grid.length, grid[0].length];
+
+   for (let i = 0; i < rows; i++) {
+      for (let j = Math.floor(Math.random() * 10 + 1); j < cols; j += Math.floor(Math.random() * 10 + 1)) {
+         if (i === 1 && j === 1 || i === rows - 2 && j === cols - 1) continue;
+
+         grid[i][j] = '#';
+
+         const currPosition = getPosition(i, j);
+         const currElem = elems[currPosition];
+
+         addWall(currElem);
+
+         await delay();
+      }
+   }
+
+   return grid;
+}
+
 async function reconstructPath(path, elems) {
    path.reverse();
 
@@ -455,6 +479,7 @@ async function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
 export const mazeAlgorithms = {
    'backtracking': backtracking,
    'huntandkill': huntAndKill,
+   'basicrandom': basicRandom,
 };
 
 export const pathfindingAlgorithms = {

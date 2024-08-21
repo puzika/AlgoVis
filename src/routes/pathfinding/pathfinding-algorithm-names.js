@@ -6,4 +6,5 @@ export const algNamesPathfinding = {
 export const algNamesMaze = {
    backtracking: 'Backtracking',
    huntandkill: 'Hunt and Kill',
+   basicrandom: 'Basic random',
 }

@@ -22,6 +22,7 @@ export default function Pathfinding() {
 
    async function handleGenerateMaze() {
       const algName = formatAlgName(mazeAlgorithm);
+      console.log(algName);
       const clone = _.cloneDeep(grid);
       const newGrid = await mazeAlgorithms[algName](clone, cellRefs.current);
       setGrid(newGrid);
