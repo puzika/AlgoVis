@@ -281,7 +281,7 @@ async function basicRandom(grid, elems) {
 
    for (let i = 0; i < rows; i++) {
       for (let j = Math.floor(Math.random() * 10 + 1); j < cols; j += Math.floor(Math.random() * 10 + 1)) {
-         if (i === 1 && j === 1 || i === rows - 2 && j === cols - 1) continue;
+         if (i === 1 && j === 1 || i === rows - 2 && j === cols - 2) continue;
 
          grid[i][j] = '#';
 
@@ -476,6 +476,87 @@ async function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
    return grid;
 }
 
+async function aStar(grid, startCoords, endCoords, elems) {
+   const [rows, cols] = [grid.length, grid[0].length];
+   const visited = new Map();
+   const queue = new PriorityQueue();
+   const prev = new Array(rows * cols).fill(null);
+   const gScore = new Array(rows * cols).fill(Infinity);
+   const fScore = new Array(rows * cols).fill(Infinity);
+   const dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+   const path = [];
+
+   const h = (y, x) => Math.abs(y - endCoords[0]) + Math.abs(x - endCoords[1]);
+
+   const startPosition = getPosition(...startCoords);
+   const endPosition = getPosition(...endCoords);
+
+   clearPath(grid, elems);
+
+   gScore[startPosition] = 0;
+   fScore[startPosition] = h(...startCoords);
+   queue.enqueue([startCoords, fScore[startPosition]]);
+
+   while (queue.size > 0) {
+      const [currCell, currFScore] = queue.dequeue();
+      const [currY, currX] = currCell;
+      const currPosition = getPosition(currY, currX);
+
+      if (currPosition === endPosition) break;
+
+      if (currFScore > fScore[currPosition]) continue;
+
+      visited.set(currPosition, currCell);
+
+      const currElem = elems[currPosition];
+
+      visitCell(currElem);
+
+      await delay();
+
+      for (const dir of dirs) {
+         const [dy, dx] = dir;
+         const [nextY, nextX] = [currY + dy, currX + dx];
+         const nextPosition = getPosition(nextY, nextX);
+         const newGScore = gScore[currPosition] + 1;
+
+         if (
+            nextY >= 0 &&
+            nextY < rows &&
+            nextX >= 0 &&
+            nextX < cols &&
+            grid[nextY][nextX] !== '#' &&
+            !visited.has(nextPosition) &&
+            newGScore < gScore[nextPosition]
+         ) {
+            const estimate = h(nextY, nextX);
+            const newFScore = newGScore + estimate;
+            gScore[nextPosition] = newGScore;
+            fScore[nextPosition] = newFScore;
+            prev[nextPosition] = currCell;
+            queue.enqueue([[nextY, nextX], newFScore]);
+         }
+      }
+   }
+
+   let currPosition = endPosition;
+   let currCell = prev[currPosition];
+
+   while (currCell && currPosition !== startPosition) {
+      path.push(currCell);
+      currPosition = getPosition(...currCell);
+      currCell = prev[currPosition];
+   }
+
+   path.unshift(endCoords);
+
+   clearVisitedCells([...visited.values()], elems);
+
+   reconstructPath(path, elems);
+
+   return grid;
+}
+
 export const mazeAlgorithms = {
    'backtracking': backtracking,
    'huntandkill': huntAndKill,
@@ -485,4 +566,5 @@ export const mazeAlgorithms = {
 export const pathfindingAlgorithms = {
    'breadthfirstsearch': breadthFirstSearch,
    'dijkstrasalgorithm': dijkstrasAlgorithm,
+   'astar': aStar,
 };
