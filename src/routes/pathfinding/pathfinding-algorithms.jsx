@@ -11,11 +11,17 @@ class PriorityQueue {
       this.queue = [];
    }
 
+   compare(idx1, idx2) {
+      if (this.queue[idx1][1] !== this.queue[idx2][1]) return this.queue[idx1][1] - this.queue[idx2][1];
+      
+      return this.queue[idx1][2] - this.queue[idx2][2];
+   }
+
    bubbleUp(idx) {
       while (idx > 0) {
          const parentIdx = Math.floor((idx - 1) / 2);
 
-         if (this.queue[parentIdx][1] <= this.queue[idx][1]) break;
+         if (this.compare(idx, parentIdx) >= 0) break;
 
          [this.queue[parentIdx], this.queue[idx]] = [this.queue[idx], this.queue[parentIdx]];
 
@@ -28,8 +34,8 @@ class PriorityQueue {
       const left = 2 * idx + 1;
       const right = 2 * idx + 2;
 
-      if (left < this.size && this.queue[left][1] < this.queue[smallest][1]) smallest = left; 
-      if (right < this.size && this.queue[right][1] < this.queue[smallest][1]) smallest = right; 
+      if (left < this.size && this.compare(smallest, left) > 0) smallest = left; 
+      if (right < this.size && this.compare(smallest, right) > 0) smallest = right; 
 
       if (smallest !== idx) {
          [this.queue[idx], this.queue[smallest]] = [this.queue[smallest], this.queue[idx]];
@@ -54,6 +60,18 @@ class PriorityQueue {
       }
 
       return min;
+   }
+
+   contains(val) {
+      const [valY, valX] = val;
+
+      for (const [currCell, currDist] of this.queue) {
+         const [currY, currX] = currCell;
+
+         if (valY === currY && valX === currX) return true;
+      }
+
+      return false;
    }
 
    get size() {
@@ -400,6 +418,8 @@ async function breadthFirstSearch(grid, startCoords, endCoords, elems) {
 
    reconstructPath(path, elems);
 
+   console.log(path);
+
    return grid;
 }
 
@@ -473,6 +493,8 @@ async function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
 
    reconstructPath(path, elems);
 
+   console.log(path);
+
    return grid;
 }
 
@@ -486,39 +508,36 @@ async function aStar(grid, startCoords, endCoords, elems) {
    const dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]];
    const path = [];
 
-   const h = (y, x) => Math.abs(y - endCoords[0]) + Math.abs(x - endCoords[1]);
-
+   const h = (y, x) => Math.abs(endCoords[0] - y) + Math.abs(endCoords[1] - x);
+   
    const startPosition = getPosition(...startCoords);
    const endPosition = getPosition(...endCoords);
-
+   
    clearPath(grid, elems);
 
    gScore[startPosition] = 0;
    fScore[startPosition] = h(...startCoords);
-   queue.enqueue([startCoords, fScore[startPosition]]);
+   queue.enqueue([startCoords, fScore[startPosition], fScore[startPosition]]);
 
    while (queue.size > 0) {
-      const [currCell, currFScore] = queue.dequeue();
+      const [currCell, currDist] = queue.dequeue();
       const [currY, currX] = currCell;
       const currPosition = getPosition(currY, currX);
 
       if (currPosition === endPosition) break;
 
-      if (currFScore > fScore[currPosition]) continue;
-
       visited.set(currPosition, currCell);
 
       const currElem = elems[currPosition];
-
+      
       visitCell(currElem);
 
       await delay();
 
-      for (const dir of dirs) {
-         const [dy, dx] = dir;
+      for (const [dy, dx] of dirs) {
          const [nextY, nextX] = [currY + dy, currX + dx];
          const nextPosition = getPosition(nextY, nextX);
-         const newGScore = gScore[currPosition] + 1;
+         const tentativeGScore = gScore[currPosition] + 1;
 
          if (
             nextY >= 0 &&
@@ -527,14 +546,13 @@ async function aStar(grid, startCoords, endCoords, elems) {
             nextX < cols &&
             grid[nextY][nextX] !== '#' &&
             !visited.has(nextPosition) &&
-            newGScore < gScore[nextPosition]
+            tentativeGScore < gScore[nextPosition]
          ) {
             const estimate = h(nextY, nextX);
-            const newFScore = newGScore + estimate;
-            gScore[nextPosition] = newGScore;
-            fScore[nextPosition] = newFScore;
+            gScore[nextPosition] = tentativeGScore;
+            fScore[nextPosition] = tentativeGScore + estimate;
             prev[nextPosition] = currCell;
-            queue.enqueue([[nextY, nextX], newFScore]);
+            queue.enqueue([[nextY, nextX], fScore[nextPosition], estimate]);
          }
       }
    }
@@ -553,6 +571,8 @@ async function aStar(grid, startCoords, endCoords, elems) {
    clearVisitedCells([...visited.values()], elems);
 
    reconstructPath(path, elems);
+
+   console.log(path);
 
    return grid;
 }
