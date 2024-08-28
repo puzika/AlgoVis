@@ -96,7 +96,18 @@ export function generateEmptyGrid() {
 }
 
 export function clearGrid(elems) {
-   elems.forEach(elem => elem.style.backgroundColor = 'transparent');
+   elems.forEach(elem => {
+      elem.style.backgroundColor = 'transparent';
+      removeWall(elem);
+   });
+}
+
+export function addWall(elem) {
+   elem.style.backgroundSize = '100% 100%';
+}
+
+export function removeWall(elem) {
+   elem.style.backgroundSize = '0 0';
 }
 
 function delay() {
@@ -109,14 +120,6 @@ function getPosition(y, x) {
    return x + y * gridWidth;
 }
 
-function addWall(elem) {
-   elem.style.backgroundColor = `${svar.colorPrimary}`;
-}
-
-function removeWall(elem) {
-   elem.style.backgroundColor = 'transparent';
-}
-
 function shuffle(arr) {
    for (let i = arr.length - 1; i > 0; i--) {
       const randIdx = Math.floor(Math.random() * (i + 1));
@@ -125,6 +128,7 @@ function shuffle(arr) {
 }
 
 function fillWithWalls(grid, elems) {
+   clearPath(grid, elems);
    elems.forEach(elem => addWall(elem));
    
    for (let i = 0; i < gridHeight; i++) {

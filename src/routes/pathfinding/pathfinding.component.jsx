@@ -20,9 +20,12 @@ export default function Pathfinding() {
    const [grid, setGrid] = useState(generateEmptyGrid());
    const cellRefs = useRef([]);
 
+   function updateGrid(updatedGrid) {
+      setGrid(updatedGrid);
+   }
+
    async function handleGenerateMaze() {
       const algName = formatAlgName(mazeAlgorithm);
-      console.log(algName);
       const clone = _.cloneDeep(grid);
       const newGrid = await mazeAlgorithms[algName](clone, cellRefs.current);
       setGrid(newGrid);
@@ -64,7 +67,7 @@ export default function Pathfinding() {
          </Toolbar>
          <S.AppContainer>
             <DataBar algorithm={pathfindingAlgorithm} extraInfo={`Maze: ${mazeAlgorithm}`} />
-            <Grid refs={cellRefs} grid={grid} start={[1, 1]} dest={[grid.length - 2, grid[0].length - 2]} />
+            <Grid refs={cellRefs} grid={grid} updateGrid={updateGrid} start={[1, 1]} dest={[grid.length - 2, grid[0].length - 2]} />
          </S.AppContainer>
       </>
    )

@@ -10,6 +10,10 @@ export const Grid = styled.div`
 export const GridCell = styled.div`
    aspect-ratio: 1;
    border: inherit;
+   background-image: radial-gradient(${svar.colorPrimary} 0%, ${svar.colorPrimary} 100%);
+   background-repeat: no-repeat;
+   background-position: center;
+   background-size: 0 0;
    transition: all .25s;
 `;
 
