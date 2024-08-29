@@ -24,6 +24,7 @@ export const HomeHeading = styled.h1`
 
 export const HomeDescription = styled.p`
    font-size: 2rem;
+   text-align: center;
 `;
 
 export const HomeNavList = styled.ul`
