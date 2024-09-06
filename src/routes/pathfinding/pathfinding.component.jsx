@@ -7,7 +7,7 @@ import DropdownItem from '../../components/dropdown-item/dropdown-item.component
 import Grid from "../../components/pathfinding-grid/pathfinding-grid.component";
 import DataBar from "../../components/data-bar/data-bar.component";
 import { algNamesPathfinding, algNamesMaze } from "./pathfinding-algorithm-names";
-import { generateEmptyGrid, clearGrid, pathfindingAlgorithms, mazeAlgorithms } from './pathfinding-algorithms';
+import { generateEmptyGrid, clearGrid, pathfindingAlgorithms, mazeAlgorithms, gridHeight, gridWidth } from './pathfinding-algorithms';
 import _ from 'lodash';
 import * as S from './pathfinding.styles';
 
@@ -18,11 +18,8 @@ function formatAlgName(algName) {
 export default function Pathfinding() {
    const {mazeAlgorithm, pathfindingAlgorithm, setMazeAlgorithm, setPathfindingAlgorithm} = useContext(PathfindingContext);
    const [grid, setGrid] = useState(generateEmptyGrid());
+   const [coords, setCoords] = useState({ source: [1, 1], dest: [gridHeight - 2, gridWidth - 2]});
    const cellRefs = useRef([]);
-
-   function updateGrid(updatedGrid) {
-      setGrid(updatedGrid);
-   }
 
    async function handleGenerateMaze() {
       const algName = formatAlgName(mazeAlgorithm);
@@ -40,7 +37,7 @@ export default function Pathfinding() {
    async function handleFindPath() {
       const algName = formatAlgName(pathfindingAlgorithm);
       const clone = _.cloneDeep(grid);
-      const newGrid = await pathfindingAlgorithms[algName](clone, [1, 1], [grid.length - 2, grid[0].length - 2], cellRefs.current);
+      const newGrid = await pathfindingAlgorithms[algName](clone, coords.source, coords.dest, cellRefs.current);
       setGrid(newGrid);
    }
 
@@ -67,7 +64,7 @@ export default function Pathfinding() {
          </Toolbar>
          <S.AppContainer>
             <DataBar algorithm={pathfindingAlgorithm} extraInfo={`Maze: ${mazeAlgorithm}`} />
-            <Grid refs={cellRefs} grid={grid} updateGrid={updateGrid} start={[1, 1]} dest={[grid.length - 2, grid[0].length - 2]} />
+            <Grid refs={cellRefs} grid={grid} updateGrid={setGrid} updateCoords={setCoords} start={coords.source} dest={coords.dest} />
          </S.AppContainer>
       </>
    )
