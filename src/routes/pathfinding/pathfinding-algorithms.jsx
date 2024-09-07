@@ -110,6 +110,24 @@ export function removeWall(elem) {
    elem.style.backgroundSize = '0 0';
 }
 
+//IF SOURCE NODE OR TARGET NODE GETS COVERED WITH A WALL WHILE GENERATING MAZE REMOVE WALL
+export function removeWallFromNodes(grid, sourceCoords, targetCoords, elems) { 
+   const [sourceY, sourceX] = sourceCoords;
+   const [targetY, targetX] = targetCoords;
+
+   grid[sourceY][sourceX] = '';
+   grid[targetY][targetX] = '';
+
+   const sourceIdx = getPosition(sourceY, sourceX);
+   const targetIdx = getPosition(targetY, targetX);
+
+   const sourceElem = elems[sourceIdx];
+   const targetElem = elems[targetIdx];
+
+   removeWall(sourceElem);
+   removeWall(targetElem);
+}
+
 function delay() {
    return new Promise((resolve) => {
       setTimeout(resolve, 10);
@@ -148,7 +166,7 @@ function isValidCell(grid, nextY, nextX) {
    );
 }
 
-async function backtracking(grid, elems) {
+async function backtracking(grid, startCoords, endCoords, elems) {
    fillWithWalls(grid, elems);
    const dirs = [[-2, 0], [0, 2], [2, 0], [0, -2]];
    
@@ -219,10 +237,12 @@ async function backtracking(grid, elems) {
       }
    }
 
+   removeWallFromNodes(grid, startCoords, endCoords, elems);
+
    return grid;
 }
 
-async function huntAndKill(grid, elems) {
+async function huntAndKill(grid, startCoords, endCoords, elems) {
    fillWithWalls(grid, elems);
    const dirs = [[-2, 0], [0, 2], [2, 0], [0, -2]];
 
@@ -292,10 +312,12 @@ async function huntAndKill(grid, elems) {
       if (!nextCell) currentCell = hunt();
    }
 
+   removeWallFromNodes(grid, startCoords, endCoords, elems);
+
    return grid;
 }
 
-async function basicRandom(grid, elems) {
+async function basicRandom(grid, startCoords, endCoords, elems) {
    grid = generateEmptyGrid();
    clearGrid(elems);
 
@@ -303,8 +325,6 @@ async function basicRandom(grid, elems) {
 
    for (let i = 0; i < rows; i++) {
       for (let j = Math.floor(Math.random() * 10 + 1); j < cols; j += Math.floor(Math.random() * 10 + 1)) {
-         if (i === 1 && j === 1 || i === rows - 2 && j === cols - 2) continue;
-
          grid[i][j] = '#';
 
          const currPosition = getPosition(i, j);
@@ -315,6 +335,8 @@ async function basicRandom(grid, elems) {
          await delay();
       }
    }
+
+   removeWallFromNodes(grid, startCoords, endCoords, elems);
 
    return grid;
 }

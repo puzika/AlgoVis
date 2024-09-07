@@ -54,6 +54,8 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
       const idx = +target.dataset.idx;    //GET THE INDEX OF THE CELL
       const [y, x] = [Math.floor(idx / cols), idx % cols];     //GET THE COORDINATES OF THE CELL
 
+      if (isSource(y, x) || isTarget(y, x)) return;
+
       if (drawing) {    //IF DRAWING IS TRUE DRAW A WALL
          gridCopy[y][x] = '#';
          addWall(target);
