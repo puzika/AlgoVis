@@ -1,6 +1,6 @@
 import * as svar from '../../variables.styles';
 
-export const maxVal = 50;
+export const maxVal = 100;
 export const minVal = 5;
 
 function generateRandomNumber() {
@@ -28,10 +28,12 @@ async function highlight(time, ...elems) {
 }
 
 function swapElems(elem1, elem2) {
-   const height1 = elem1.offsetHeight;
-   const height2 = elem2.offsetHeight;
-   elem1.style.height = `${height2}px`;
-   elem2.style.height = `${height1}px`;
+   const height1 = elem1.style.height;
+   const height2 = elem2.style.height;
+   elem1.style.height = height2;
+   elem2.style.height = height1;
+
+   console.log(height1, height2);
 }
 
 async function heapSort(array, elems) {
@@ -108,12 +110,12 @@ async function mergeSort(array, elems) {
 
          if (array[leftChunk[leftIdx]] < array[rightChunk[rightIdx]]) {
             merged.push(leftChunk[leftIdx]);
-            currentElem.style.height = `${array[leftChunk[leftIdx]]}rem`;
+            currentElem.style.height = `${array[leftChunk[leftIdx]]}%`;
             await highlight(array.length, currentElem);
             leftIdx++;
          } else {
             merged.push(rightChunk[rightIdx]);
-            currentElem.style.height = `${array[rightChunk[rightIdx]]}rem`;
+            currentElem.style.height = `${array[rightChunk[rightIdx]]}%`;
             await highlight(array.length, currentElem);
             rightIdx++;
          }
@@ -126,7 +128,7 @@ async function mergeSort(array, elems) {
 
          const currentElem = elems[currentElemIdx];
 
-         currentElem.style.height = `${array[leftChunk[leftIdx]]}rem`;
+         currentElem.style.height = `${array[leftChunk[leftIdx]]}%`;
          await highlight(array.length, currentElem);
 
          leftIdx++;
@@ -138,7 +140,7 @@ async function mergeSort(array, elems) {
 
          const currentElem = elems[currentElemIdx];
 
-         currentElem.style.height = `${array[rightChunk[rightIdx]]}rem`;
+         currentElem.style.height = `${array[rightChunk[rightIdx]]}%`;
          await highlight(array.length, currentElem);
 
          rightIdx++;

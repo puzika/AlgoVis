@@ -18,6 +18,7 @@ function formatAlgName(algName) {
 export default function Sorting() {
    const {size, setSize, algorithm, setAlgorithm} = useContext(SortingContext);
    const [array, setArray] = useState(generateRandomArray(size));
+   const [maxSize, setMaxSize] = useState(200);
    const barRefs = useRef([]);
 
    function handleChange(e) {
@@ -47,7 +48,7 @@ export default function Sorting() {
                   ))
                }
             </Dropdown>
-            <RangeSlider name={'Size'} width={'15%'} min='10' max='200' value={size} changeHandler={handleChange} />
+            <RangeSlider name={'Size'} width={'15%'} min='10' max={maxSize} value={size} changeHandler={handleChange} />
             <Button clickHandler={handleGenerate} name={'Generate array'} styleType={ButtonTypes.filled} />
             <Button clickHandler={handleSort} name={'Sort'} styleType={ButtonTypes.transparent} />
          </Toolbar>

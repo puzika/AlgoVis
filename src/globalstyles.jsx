@@ -1,4 +1,5 @@
 import { createGlobalStyle } from "styled-components";
+import { responsive } from "./breakpoints";
 
 export const GlobalStyles = createGlobalStyle`
   *,
@@ -12,6 +13,14 @@ export const GlobalStyles = createGlobalStyle`
   html {
     font-size: 62.5%;
     box-sizing: border-box;
+
+    ${responsive.tb`
+      font-size: 50%;
+    `};
+
+    ${responsive.mb`
+      font-size: 45%;
+    `};
   }
 
   body {
