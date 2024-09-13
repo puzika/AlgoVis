@@ -15,6 +15,11 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
    let cleaning = false;
    let draggedElem = null;
 
+   function isTouchEnabled() {
+      return('ontouchstart' in window) ||
+            (navigator.maxTouchPoints > 0);
+   }
+
    function isSource(y, x) {
       return y === startY && x === startX;
    }
@@ -25,13 +30,7 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
 
    //DRAWING AND ERASING WALLS
 
-   function handleMouseDown(e) {    //START DRAWING / ERASING WALLS
-      const {target} = e;
-
-      if (!target.classList.contains('cell')) return;    //IF CLICKED ELEMENT NOT CELL RETURN
-
-      e.preventDefault();     //PREVENT DRAGGING CELL
-
+   function initializeDrawing(target) {
       const idx = +target.dataset.idx;    //GET THE INDEX OF THE CELL
       const [y, x] = [Math.floor(idx / cols), idx % cols];     //GET THE COORDINATES OF THE CELL
 
@@ -46,11 +45,7 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
       }
    }
 
-   function handleMouseOver(e) {    //KEEP DRAWING / ERASING WALLS 
-      const {target} = e;
-
-      if (!target.classList.contains('cell')) return;    //DO NOTHING IF THE ELEMENT THE MOUSE IS OVER IS NOT A CELL
-
+   function keepDrawing(target) {
       const idx = +target.dataset.idx;    //GET THE INDEX OF THE CELL
       const [y, x] = [Math.floor(idx / cols), idx % cols];     //GET THE COORDINATES OF THE CELL
 
@@ -65,14 +60,65 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
       }
    }
 
-   function handleMouseUp() {    //WHEN THE MOUSE UP EVENT IS TRIGGERED STOP DRAWING / CLEANING AND UPDATE GRID
+   function stopDrawing() {
       drawing = false;
       cleaning = false;
       updateGrid(gridCopy);
+   }
+
+   function handleMouseDown(e) {    //START DRAWING / ERASING WALLS
+      if (isTouchEnabled()) return;    //MOUSE EVENTS SHOULD NOT TRIGGER IF DEVICE USES TOUCH
+
+      const {target} = e;
+
+      if (!target.classList.contains('cell')) return;    //IF CLICKED ELEMENT NOT CELL RETURN
+
+      e.preventDefault();     //PREVENT DRAGGING CELL
+
+      initializeDrawing(target);
+   }
+
+   function handleMouseOver(e) {    //KEEP DRAWING / ERASING WALLS 
+      if (isTouchEnabled()) return;    //MOUSE EVENTS SHOULD NOT TRIGGER IF DEVICE USES TOUCH
+
+      const {target} = e;
+
+      if (!target.classList.contains('cell')) return;    //DO NOTHING IF THE ELEMENT THE MOUSE IS OVER IS NOT A CELL
+
+      keepDrawing(target);
+   }
+
+   function handleMouseUp() {    //WHEN THE MOUSE UP EVENT IS TRIGGERED STOP DRAWING / CLEANING AND UPDATE GRID
+      if (isTouchEnabled()) return;    //MOUSE EVENTS SHOULD NOT TRIGGER IF DEVICE USES TOUCH
+
+      stopDrawing();
    } 
 
    function handleMouseLeave() {    //WHEN TEH MOUSE LEAVES THE GRID STOP DRAWING / CLEANING AND UPDATE GRID
       handleMouseUp();
+   }
+
+   //DRAWING AND ERASING WALLS (MOBILE)
+
+   function handleTouchStart(e) {
+      const {target} = e;
+
+      if (!target.classList.contains('cell')) return; //IF THE ELEMENT IS NOT A CELL RETURN
+
+      initializeDrawing(target);
+   }
+
+   function handleTouchMove(e) {
+      const touch = e.touches[0];   //GET TOUCH ELEMENT
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);    //GET TOUCH DOM ELEMENT
+
+      if (!target.classList.contains('cell')) return;    //IF ELEMENT IS NOT A CELL RETURN
+
+      keepDrawing(target);
+   }
+
+   function handleTouchEnd() {
+      stopDrawing();
    }
 
    //DRAG AND DROP
@@ -123,10 +169,20 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
    return (
       <S.Grid 
          $width={gridWidth} 
+
+         //DRAWING LISTENERS
+         //MOUSE EVENTS
          onMouseDown={handleMouseDown}
          onMouseOver={handleMouseOver}
          onMouseUp={handleMouseUp}
          onMouseLeave={handleMouseLeave}
+
+         //TOUCH EVENTS
+         onTouchStart={handleTouchStart}
+         onTouchMove={handleTouchMove}
+         onTouchEnd={handleTouchEnd}
+
+         //DRAG AND DROP LISTENERS
 
          onDragOver={handleDragOver}
          onDrop={handleDrop}
