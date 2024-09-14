@@ -14,6 +14,7 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
    let drawing = false;
    let cleaning = false;
    let draggedElem = null;
+   let dragCurrCoords = [];
 
    function isTouchEnabled() {
       return('ontouchstart' in window) ||
@@ -66,6 +67,37 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
       updateGrid(gridCopy);
    }
 
+   function drop(target) {
+      const idx = +target.dataset.idx;    //GET THE INDEX OF THE DROP CELL
+      const [y, x] = [Math.floor(idx / cols), idx % cols];    //GET ITS COORDINATES
+
+      if (isSource(y, x) || isTarget(y, x)) return;     //IF THE CELL CONTAINS THE SOURCE NODE OR THE TARGET NODE RETURN
+
+      if (gridCopy[y][x] === '#') {    //IF THE CELL THE DRAGGED ITEM IS DROPPED ON IS A WALL REMOVE IT
+         gridCopy[y][x] = '';
+         removeWall(target);
+         updateGrid(gridCopy);
+      }
+
+      if (draggedElem.classList.contains('source')) {      //IF THE DRAGGED ITEM IS THE SOURCE NODE UPDATE SOURCE NODE COORDINATES
+         const newCoords = {
+            source: [y, x],
+            dest: [endY, endX]
+         }
+
+         updateCoords(newCoords);
+      } else {    ////IF THE DRAGGED ITEM IS THE TARGET NODE UPDATE TARGET NODE COORDINATES
+         const newCoords = {
+            source: [startY, startX],
+            dest: [y, x]
+         }
+
+         updateCoords(newCoords);
+      }
+
+      draggedElem = null;
+   }
+
    function handleMouseDown(e) {    //START DRAWING / ERASING WALLS
       if (isTouchEnabled()) return;    //MOUSE EVENTS SHOULD NOT TRIGGER IF DEVICE USES TOUCH
 
@@ -114,11 +146,21 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
 
       if (!target.classList.contains('cell')) return;    //IF ELEMENT IS NOT A CELL RETURN
 
-      keepDrawing(target);
+      if (cleaning || drawing) keepDrawing(target);   //IF CLEANING OR DRAWING IS TRUE KEEP DRAWING / ERASING WALLS
+      else if (draggedElem) {
+         dragCurrCoords = [touch.clientX, touch.clientY];   //TRACK COORDS OF THE DRAGGED ELEMENT
+      }
    }
 
    function handleTouchEnd() {
-      stopDrawing();
+      if (drawing || cleaning) stopDrawing();   //IF DRAWING / CLEANING STOP DRAWING / CLEANING
+      else if (draggedElem) {    //IF DRAGGING, DROP
+         const dropzone = document.elementFromPoint(...dragCurrCoords);    //GET DROPZONE COORDS
+         
+         if (!dropzone.classList.contains('cell')) return;  //IF DROPZONE IS NOT A CELL RETURN
+
+         drop(dropzone);
+      }
    }
 
    //DRAG AND DROP
@@ -138,33 +180,21 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
 
       if (!target.classList.contains('cell')) return;  //IF THE DROPZONE IS NOT AN EMPTY CELL RETURN
 
-      const idx = +target.dataset.idx;    //GET THE INDEX OF THE DROP CELL
-      const [y, x] = [Math.floor(idx / cols), idx % cols];    //GET ITS COORDINATES
-
-      if (isSource(y, x) || isTarget(y, x)) return;     //IF THE CELL CONTAINS THE SOURCE NODE OR THE TARGET NODE RETURN
-
-      if (gridCopy[y][x] === '#') {    //IF THE CELL THE DRAGGED ITEM IS DROPPED ON IS A WALL REMOVE IT
-         gridCopy[y][x] = '';
-         removeWall(target);
-         updateGrid(gridCopy);
-      }
-
-      if (draggedElem.classList.contains('source')) {      //IF THE DRAGGED ITEM IS THE SOURCE NODE UPDATE SOURCE NODE COORDINATES
-         const newCoords = {
-            source: [y, x],
-            dest: [endY, endX]
-         }
-
-         updateCoords(newCoords);
-      } else {    ////IF THE DRAGGED ITEM IS THE TARGET NODE UPDATE TARGET NODE COORDINATES
-         const newCoords = {
-            source: [startY, startX],
-            dest: [y, x]
-         }
-
-         updateCoords(newCoords);
-      }
+      drop(target);
    }
+
+   //DRAG AND DROP (MOBILE)
+
+   function handleDragStartTouch(e) {
+      e.stopPropagation();
+
+      draggedElem = e.target;    //SAVE REF TO DRAGGED ELEMENT
+      
+      const touch = e.touches[0];   //GET TOUCH ELEMENT
+      
+      dragCurrCoords = [touch.clientX, touch.clientY];   //SAVE CURRENT COORDINATES OF DRAGGED ELEMENT  
+   }
+
 
    return (
       <S.Grid 
@@ -183,7 +213,7 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
          onTouchEnd={handleTouchEnd}
 
          //DRAG AND DROP LISTENERS
-
+         //MOUSE EVENTS
          onDragOver={handleDragOver}
          onDrop={handleDrop}
       >
@@ -197,9 +227,9 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
                   >
                      {
                         i === startY && j === startX ? 
-                        <S.GridCellImg className='source' onDragStart={handleDragStart} src={sourceImg} alt='start node' /> :
+                        <S.GridCellImg className='source' onDragStart={handleDragStart} onTouchStart={handleDragStartTouch} src={sourceImg} alt='start node' /> :
                         i === endY && j === endX && 
-                        <S.GridCellImg className='target' onDragStart={handleDragStart} src={destinationImg} alt='end node' />
+                        <S.GridCellImg className='target' onDragStart={handleDragStart} onTouchStart={handleDragStartTouch} src={destinationImg} alt='end node' />
                      }
                   </S.GridCell>
                )) 
