@@ -14,10 +14,6 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
    const gridCopy = cloneDeep(grid);
    const [width, height] = gridSize;
 
-   useEffect(() => {
-      refs.current = refs.current.slice(0, grid.length);
-   }, [grid]);
-
    let drawing = false;
    let cleaning = false;
    let draggedElem = null;

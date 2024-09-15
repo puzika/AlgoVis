@@ -4,6 +4,7 @@ import * as svar from '../../variables.styles';
 export const Grid = styled.div`
    display: grid;
    border: .1rem solid ${svar.colorPrimaryLighter};
+   touch-action: none;  //TO PREVENT SCROLL ON TOUCHMOVE
 `;
 
 export const GridCell = styled.div`

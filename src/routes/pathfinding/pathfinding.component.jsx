@@ -28,6 +28,7 @@ export default function Pathfinding() {
          const [newWidth, newHeight] = getCurrentDimensions();
 
          if (newWidth !== gridWidth || newHeight !== gridHeight) {
+            clearGrid(cellRefs.current);
             setGridSize([newWidth, newHeight]);
             setGrid(generateEmptyGrid(newHeight, newWidth));
             setCoords({...coords, dest: [newHeight - 2, newWidth - 2]});
@@ -40,7 +41,7 @@ export default function Pathfinding() {
    }, [gridSize]);
 
    useEffect(() => {
-      clearGrid(cellRefs.current);
+      cellRefs.current = cellRefs.current.slice(0, gridWidth * gridHeight);      //UPDATE REFS
    }, [grid]);
 
    async function handleGenerateMaze() {
