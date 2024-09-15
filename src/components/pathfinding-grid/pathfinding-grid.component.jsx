@@ -1,4 +1,5 @@
-import { gridWidth } from '../../routes/pathfinding/pathfinding-algorithms';
+import { useContext } from 'react';
+import { PathfindingContext } from '../../contexts/pathfinding';
 import sourceImg from '../../assets/source.svg';
 import destinationImg from '../../assets/destination.svg';
 import { addWall, removeWall } from '../../routes/pathfinding/pathfinding-algorithms';
@@ -6,10 +7,12 @@ import { cloneDeep } from 'lodash';
 import * as S from './pathfinding-grid.styles';
 
 export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}) {     //start - start position; dest - end position, i.e. destination
+   const {gridSize} = useContext(PathfindingContext);
    const [rows, cols] = [grid.length, grid[0].length];
    const [startY, startX] = start;
    const [endY, endX] = dest;
    const gridCopy = cloneDeep(grid);
+   const [width, height] = gridSize;
 
    let drawing = false;
    let cleaning = false;
@@ -198,7 +201,9 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
 
    return (
       <S.Grid 
-         $width={gridWidth} 
+         style={{
+            gridTemplateColumns: `repeat(${width}, 1fr)`
+         }} 
 
          //DRAWING LISTENERS
          //MOUSE EVENTS

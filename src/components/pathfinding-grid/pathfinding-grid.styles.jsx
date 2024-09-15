@@ -3,7 +3,6 @@ import * as svar from '../../variables.styles';
 
 export const Grid = styled.div`
    display: grid;
-   grid-template-columns: repeat(${({$width}) => $width}, 1fr);
    border: .1rem solid ${svar.colorPrimaryLighter};
 `;
 

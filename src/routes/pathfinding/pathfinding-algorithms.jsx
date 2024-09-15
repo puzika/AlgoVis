@@ -3,7 +3,7 @@ import * as svar from '../../variables.styles';
 
 //BOTH GRIDWIDTH AND GRIDHEIGHT MUST BE ODD
 
-export const gridWidth = 65;
+export const gridWidth = 15;
 export const gridHeight = 25;
 
 class PriorityQueue {
@@ -79,13 +79,13 @@ class PriorityQueue {
    }
 }
 
-export function generateEmptyGrid() {
+export function generateEmptyGrid(rows, cols) {
    const grid = [];
 
-   for (let i = 0; i < gridHeight; i++) {
+   for (let i = 0; i < rows; i++) {
       const row = [];
 
-      for (let j = 0; j < gridWidth; j++) {
+      for (let j = 0; j < cols; j++) {
          row.push('');
       }
 
@@ -112,14 +112,16 @@ export function removeWall(elem) {
 
 //IF SOURCE NODE OR TARGET NODE GETS COVERED WITH A WALL WHILE GENERATING MAZE REMOVE WALL
 export function removeWallFromNodes(grid, sourceCoords, targetCoords, elems) { 
+   const cols = grid[0].length;
+
    const [sourceY, sourceX] = sourceCoords;
    const [targetY, targetX] = targetCoords;
 
    grid[sourceY][sourceX] = '';
    grid[targetY][targetX] = '';
 
-   const sourceIdx = getPosition(sourceY, sourceX);
-   const targetIdx = getPosition(targetY, targetX);
+   const sourceIdx = getPosition(sourceY, sourceX, cols);
+   const targetIdx = getPosition(targetY, targetX, cols);
 
    const sourceElem = elems[sourceIdx];
    const targetElem = elems[targetIdx];
@@ -134,8 +136,8 @@ function delay() {
    })
 }
 
-function getPosition(y, x) {
-   return x + y * gridWidth;
+function getPosition(y, x, cols) {
+   return x + y * cols;
 }
 
 function shuffle(arr) {
@@ -146,27 +148,33 @@ function shuffle(arr) {
 }
 
 function fillWithWalls(grid, elems) {
+   const [rows, cols] = [grid.length, grid[0].length];
+
    clearPath(grid, elems);
    elems.forEach(elem => addWall(elem));
    
-   for (let i = 0; i < gridHeight; i++) {
-      for (let j = 0; j < gridWidth; j++) {
+   for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
          grid[i][j] = '#';
       }
    }
 } 
 
 function isValidCell(grid, nextY, nextX) {
+   const [rows, cols] = [grid.length, grid[0].length];
+
    return (
       nextY >= 0 &&
-      nextY < gridHeight &&
+      nextY < rows &&
       nextX >= 0 &&
-      nextX < gridWidth &&
+      nextX < cols &&
       grid[nextY][nextX] !== ''
    );
 }
 
 async function backtracking(grid, startCoords, endCoords, elems) {
+   const [rows, cols] = [grid.length, grid[0].length];
+
    fillWithWalls(grid, elems);
    const dirs = [[-2, 0], [0, 2], [2, 0], [0, -2]];
    
@@ -177,7 +185,7 @@ async function backtracking(grid, startCoords, endCoords, elems) {
 
    grid[currY][currX] = '';
 
-   const firstPosition = getPosition(currY, currX);
+   const firstPosition = getPosition(currY, currX, cols);
    const firstElem = elems[firstPosition];
 
    removeWall(firstElem);
@@ -206,8 +214,8 @@ async function backtracking(grid, startCoords, endCoords, elems) {
             
             if (isValidCell(grid, nextY, nextX)) {
                const [midY, midX] = [currY + dy / 2, currX + dx / 2];
-               const midPosition = getPosition(midY, midX);
-               const nextPosition = getPosition(nextY, nextX);
+               const midPosition = getPosition(midY, midX, cols);
+               const nextPosition = getPosition(nextY, nextX, cols);
                const midElem = elems[midPosition];
                const nextElem = elems[nextPosition];
 
@@ -243,12 +251,14 @@ async function backtracking(grid, startCoords, endCoords, elems) {
 }
 
 async function huntAndKill(grid, startCoords, endCoords, elems) {
+   const [rows, cols] = [grid.length, grid[0].length];
+
    fillWithWalls(grid, elems);
    const dirs = [[-2, 0], [0, 2], [2, 0], [0, -2]];
 
    const hunt = () => {
-      for (let i = 1; i < gridHeight; i += 2) {
-         for (let j = 1; j < gridWidth; j += 2) {
+      for (let i = 1; i < rows; i += 2) {
+         for (let j = 1; j < cols; j += 2) {
             if (grid[i][j] === '') {
                for (const dir of dirs) {
                   const [dy, dx] = dir;
@@ -266,7 +276,7 @@ async function huntAndKill(grid, startCoords, endCoords, elems) {
    grid[1][1] = '';  //MARK FIRST CELL AS VISITED
    
    let currentCell = [1, 1];
-   const firstElemPosition = getPosition(1, 1);
+   const firstElemPosition = getPosition(1, 1, cols);
    const firstElem = elems[firstElemPosition];
 
    removeWall(firstElem);
@@ -287,8 +297,8 @@ async function huntAndKill(grid, startCoords, endCoords, elems) {
 
          if (nextCell) {
             const [midY, midX] = [currY + dy / 2, currX + dx / 2];
-            const midElemPosition = getPosition(midY, midX);
-            const nextElemPosition = getPosition(nextY, nextX);
+            const midElemPosition = getPosition(midY, midX, cols);
+            const nextElemPosition = getPosition(nextY, nextX, cols);
             const midElem = elems[midElemPosition];
             const nextElem = elems[nextElemPosition];
 
@@ -318,16 +328,16 @@ async function huntAndKill(grid, startCoords, endCoords, elems) {
 }
 
 async function basicRandom(grid, startCoords, endCoords, elems) {
-   grid = generateEmptyGrid();
-   clearGrid(elems);
-
    const [rows, cols] = [grid.length, grid[0].length];
+
+   grid = generateEmptyGrid(rows, cols);
+   clearGrid(elems);
 
    for (let i = 0; i < rows; i++) {
       for (let j = Math.floor(Math.random() * 10 + 1); j < cols; j += Math.floor(Math.random() * 10 + 1)) {
          grid[i][j] = '#';
 
-         const currPosition = getPosition(i, j);
+         const currPosition = getPosition(i, j, cols);
          const currElem = elems[currPosition];
 
          addWall(currElem);
@@ -341,11 +351,11 @@ async function basicRandom(grid, startCoords, endCoords, elems) {
    return grid;
 }
 
-async function reconstructPath(path, elems) {
+async function reconstructPath(path, cols, elems) {
    path.reverse();
 
    for (const cell of path) {
-      const position = getPosition(...cell);
+      const position = getPosition(...cell, cols);
       const cellElem = elems[position];
 
       await delay();
@@ -354,9 +364,9 @@ async function reconstructPath(path, elems) {
    }
 }
 
-function clearVisitedCells(visited, elems) {
+function clearVisitedCells(visited, cols, elems) {
    for (const cell of visited) {
-      const cellPosition = getPosition(...cell);
+      const cellPosition = getPosition(...cell, cols);
       const cellElem = elems[cellPosition];
 
       cellElem.style.boxShadow = 'none';
@@ -370,7 +380,7 @@ function clearPath(grid, elems) {
       for (let j = 0; j < cols; j++) {
          if (grid[i][j] === '#') continue;
 
-         const cellPosition = getPosition(i, j);
+         const cellPosition = getPosition(i, j, cols);
          const cellElem = elems[cellPosition];
 
          cellElem.style.backgroundColor = 'transparent';
@@ -392,12 +402,12 @@ async function breadthFirstSearch(grid, startCoords, endCoords, elems) {
 
    clearPath(grid, elems);    //CLEAR PREVIOUSLY ANIMATED PATH
 
-   const startPosition = getPosition(...startCoords);
-   const endPosition = getPosition(...endCoords);
+   const startPosition = getPosition(...startCoords, cols);
+   const endPosition = getPosition(...endCoords, cols);
 
    while (queue.length > 0) {
       const [currY, currX] = queue.shift();
-      const currPosition = getPosition(currY, currX);
+      const currPosition = getPosition(currY, currX, cols);
 
       if (visited.has(currPosition)) continue;
       else visited.set(currPosition, [currY, currX]);
@@ -413,7 +423,7 @@ async function breadthFirstSearch(grid, startCoords, endCoords, elems) {
       for (const dir of dirs) {
          const [dy, dx] = dir;
          const [nextY, nextX] = [currY + dy, currX + dx];
-         const nextPosition = getPosition(nextY, nextX);
+         const nextPosition = getPosition(nextY, nextX, cols);
 
          if (
             nextY >= 0 &&
@@ -434,15 +444,15 @@ async function breadthFirstSearch(grid, startCoords, endCoords, elems) {
 
    while (currCell && currPosition !== startPosition) {
       path.push(currCell);
-      currPosition = getPosition(...currCell);
+      currPosition = getPosition(...currCell, cols);
       currCell = prev[currPosition];
    }
 
    path.unshift(endCoords);
 
-   clearVisitedCells([...visited.values()], elems);
+   clearVisitedCells([...visited.values()], cols, elems);
 
-   reconstructPath(path, elems);
+   reconstructPath(path, cols, elems);
 
    console.log(path);
 
@@ -458,8 +468,8 @@ async function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
    const dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]];
    const path = [];
 
-   const startPosition = getPosition(...startCoords);
-   const endPosition = getPosition(...endCoords);
+   const startPosition = getPosition(...startCoords, cols);
+   const endPosition = getPosition(...endCoords, cols);
 
    clearPath(grid, elems);    //CLEAR PREVIOUSLY ANIMATED PATH
 
@@ -469,7 +479,7 @@ async function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
    while (queue.size > 0) {
       const [currCell, currDist] = queue.dequeue();
       const [currY, currX] = currCell;
-      const currPosition = getPosition(currY, currX);
+      const currPosition = getPosition(currY, currX, cols);
 
       if (currPosition === endPosition) break;
 
@@ -485,7 +495,7 @@ async function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
 
       for (const [dy, dx] of dirs) {
          const [nextY, nextX] = [currY + dy, currX + dx];
-         const nextPosition = getPosition(nextY, nextX);
+         const nextPosition = getPosition(nextY, nextX, cols);
          const newDist = currDist + 1;
 
          if (
@@ -509,15 +519,15 @@ async function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
 
    while (currCell && currPosition !== startPosition) {
       path.push(currCell);
-      currPosition = getPosition(...currCell);
+      currPosition = getPosition(...currCell, cols);
       currCell = prev[currPosition];
    }
 
    path.unshift(endCoords);
 
-   clearVisitedCells([...visited.values()], elems);
+   clearVisitedCells([...visited.values()], cols, elems);
 
-   reconstructPath(path, elems);
+   reconstructPath(path, cols, elems);
 
    console.log(path);
 
@@ -536,8 +546,8 @@ async function aStar(grid, startCoords, endCoords, elems) {
 
    const h = (y, x) => Math.abs(endCoords[0] - y) + Math.abs(endCoords[1] - x);
    
-   const startPosition = getPosition(...startCoords);
-   const endPosition = getPosition(...endCoords);
+   const startPosition = getPosition(...startCoords, cols);
+   const endPosition = getPosition(...endCoords, cols);
    
    clearPath(grid, elems);
 
@@ -548,7 +558,7 @@ async function aStar(grid, startCoords, endCoords, elems) {
    while (queue.size > 0) {
       const [currCell, currDist] = queue.dequeue();
       const [currY, currX] = currCell;
-      const currPosition = getPosition(currY, currX);
+      const currPosition = getPosition(currY, currX, cols);
 
       if (currPosition === endPosition) break;
 
@@ -562,7 +572,7 @@ async function aStar(grid, startCoords, endCoords, elems) {
 
       for (const [dy, dx] of dirs) {
          const [nextY, nextX] = [currY + dy, currX + dx];
-         const nextPosition = getPosition(nextY, nextX);
+         const nextPosition = getPosition(nextY, nextX, cols);
          const tentativeGScore = gScore[currPosition] + 1;
 
          if (
@@ -588,15 +598,15 @@ async function aStar(grid, startCoords, endCoords, elems) {
 
    while (currCell && currPosition !== startPosition) {
       path.push(currCell);
-      currPosition = getPosition(...currCell);
+      currPosition = getPosition(...currCell, cols);
       currCell = prev[currPosition];
    }
 
    path.unshift(endCoords);
 
-   clearVisitedCells([...visited.values()], elems);
+   clearVisitedCells([...visited.values()], cols, elems);
 
-   reconstructPath(path, elems);
+   reconstructPath(path, cols, elems);
 
    console.log(path);
 

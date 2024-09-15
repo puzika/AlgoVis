@@ -1,4 +1,4 @@
-import { useContext, useState, useRef } from 'react';
+import { useContext, useState, useRef, useEffect } from 'react';
 import { PathfindingContext } from '../../contexts/pathfinding';
 import Toolbar from '../../components/toolbar/toolbar.component';
 import Button, { ButtonTypes } from '../../components/button/button.component';
@@ -7,7 +7,8 @@ import DropdownItem from '../../components/dropdown-item/dropdown-item.component
 import Grid from "../../components/pathfinding-grid/pathfinding-grid.component";
 import DataBar from "../../components/data-bar/data-bar.component";
 import { algNamesPathfinding, algNamesMaze } from "./pathfinding-algorithm-names";
-import { generateEmptyGrid, clearGrid, pathfindingAlgorithms, mazeAlgorithms, gridHeight, gridWidth } from './pathfinding-algorithms';
+import { generateEmptyGrid, clearGrid, pathfindingAlgorithms, mazeAlgorithms } from './pathfinding-algorithms';
+import { getCurrentDimensions } from '../../contexts/pathfinding';
 import _ from 'lodash';
 import * as S from './pathfinding.styles';
 
@@ -16,10 +17,23 @@ function formatAlgName(algName) {
 }
 
 export default function Pathfinding() {
-   const {mazeAlgorithm, pathfindingAlgorithm, setMazeAlgorithm, setPathfindingAlgorithm} = useContext(PathfindingContext);
-   const [grid, setGrid] = useState(generateEmptyGrid());
+   const {mazeAlgorithm, pathfindingAlgorithm, setMazeAlgorithm, setPathfindingAlgorithm, gridSize, setGridSize} = useContext(PathfindingContext);
+   const [gridWidth, gridHeight] = gridSize;
+   const [grid, setGrid] = useState(generateEmptyGrid(gridHeight, gridWidth));
    const [coords, setCoords] = useState({ source: [1, 1], dest: [gridHeight - 2, gridWidth - 2]});
    const cellRefs = useRef([]);
+
+   useEffect(() => {
+      const updateSize = () => {
+         const [newWidth, newHeight] = getCurrentDimensions();
+
+         if (newWidth !== gridWidth || newHeight !== gridHeight) setGridSize([newWidth, newHeight]);
+      }
+
+      window.addEventListener('resize', updateSize);
+
+      return () => window.removeEventListener('resize', updateSize);
+   }, [gridSize]);
 
    async function handleGenerateMaze() {
       const algName = formatAlgName(mazeAlgorithm);
@@ -29,7 +43,7 @@ export default function Pathfinding() {
    }
 
    function handleClearGrid() {
-      const emptyGrid = generateEmptyGrid();
+      const emptyGrid = generateEmptyGrid(gridHeight, gridWidth);
       clearGrid(cellRefs.current);
       setGrid(emptyGrid);
    }
