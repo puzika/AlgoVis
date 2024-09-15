@@ -11,7 +11,7 @@ const gridWidths = {
    mb: 15,
    tb: 25,
    lp: 35,
-   tv: 55,
+   tv: 45,
 }
 
 export function getCurrentDimensions() {
