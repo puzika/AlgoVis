@@ -27,13 +27,21 @@ export default function Pathfinding() {
       const updateSize = () => {
          const [newWidth, newHeight] = getCurrentDimensions();
 
-         if (newWidth !== gridWidth || newHeight !== gridHeight) setGridSize([newWidth, newHeight]);
+         if (newWidth !== gridWidth || newHeight !== gridHeight) {
+            setGridSize([newWidth, newHeight]);
+            setGrid(generateEmptyGrid(newHeight, newWidth));
+            setCoords({...coords, dest: [newHeight - 2, newWidth - 2]});
+         }
       }
 
       window.addEventListener('resize', updateSize);
 
       return () => window.removeEventListener('resize', updateSize);
    }, [gridSize]);
+
+   useEffect(() => {
+      clearGrid(cellRefs.current);
+   }, [grid]);
 
    async function handleGenerateMaze() {
       const algName = formatAlgName(mazeAlgorithm);

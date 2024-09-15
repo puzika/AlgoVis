@@ -23,7 +23,7 @@ export function getCurrentDimensions() {
 
    if (currentScreenWidth <= device.mb) width = gridWidths.mb;
    else if (currentScreenWidth <= device.tb) width = gridWidths.tb;
-   else if (currentScreenWidth <= device.lb) width = gridWidths.lp;
+   else if (currentScreenWidth <= device.lp) width = gridWidths.lp;
    else width = gridWidths.tv;
 
    return [width, height];

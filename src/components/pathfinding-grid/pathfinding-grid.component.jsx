@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { PathfindingContext } from '../../contexts/pathfinding';
 import sourceImg from '../../assets/source.svg';
 import destinationImg from '../../assets/destination.svg';
@@ -13,6 +13,10 @@ export default function Grid({grid, refs, start, dest, updateGrid, updateCoords}
    const [endY, endX] = dest;
    const gridCopy = cloneDeep(grid);
    const [width, height] = gridSize;
+
+   useEffect(() => {
+      refs.current = refs.current.slice(0, grid.length);
+   }, [grid]);
 
    let drawing = false;
    let cleaning = false;
