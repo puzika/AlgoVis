@@ -1,5 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 import { responsive } from "./breakpoints";
+import * as svar from './variables.styles';
 
 export const GlobalStyles = createGlobalStyle`
   *,
@@ -28,6 +29,16 @@ export const GlobalStyles = createGlobalStyle`
     font-size: 2rem;
     color: white;
     background-color: #101010;
+
+    &::-webkit-scrollbar {
+      width: 2rem;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: ${svar.colorPrimary};
+      border: .5rem solid ${svar.colorBase};
+      border-radius: 10rem;
+    }
   }
 
 
