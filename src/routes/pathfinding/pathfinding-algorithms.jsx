@@ -1,11 +1,6 @@
 import { get } from 'lodash';
 import * as svar from '../../variables.styles';
 
-//BOTH GRIDWIDTH AND GRIDHEIGHT MUST BE ODD
-
-export const gridWidth = 15;
-export const gridHeight = 25;
-
 class PriorityQueue {
    constructor() {
       this.queue = [];
@@ -398,7 +393,7 @@ async function breadthFirstSearch(grid, startCoords, endCoords, elems) {
    const prev = new Array(rows * cols).fill(null);
    const dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]];
    const queue = [startCoords];
-   const path = [];
+   let path = [endCoords];
 
    clearPath(grid, elems);    //CLEAR PREVIOUSLY ANIMATED PATH
 
@@ -442,13 +437,16 @@ async function breadthFirstSearch(grid, startCoords, endCoords, elems) {
    let currPosition = endPosition;
    let currCell = prev[currPosition];
 
-   while (currCell && currPosition !== startPosition) {
+   while (currPosition !== startPosition) {
+      if (!currCell) {
+         path = [];
+         break;
+      }
+
       path.push(currCell);
       currPosition = getPosition(...currCell, cols);
       currCell = prev[currPosition];
    }
-
-   path.unshift(endCoords);
 
    clearVisitedCells([...visited.values()], cols, elems);
 
@@ -466,7 +464,7 @@ async function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
    const dist = new Array(rows * cols).fill(Infinity);
    const prev = new Array(rows * cols).fill(null);
    const dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]];
-   const path = [];
+   let path = [endCoords];
 
    const startPosition = getPosition(...startCoords, cols);
    const endPosition = getPosition(...endCoords, cols);
@@ -517,13 +515,16 @@ async function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
    let currPosition = endPosition;
    let currCell = prev[currPosition];
 
-   while (currCell && currPosition !== startPosition) {
+   while (currPosition !== startPosition) {
+      if (!currCell) {
+         path = [];
+         break;
+      }
+
       path.push(currCell);
       currPosition = getPosition(...currCell, cols);
       currCell = prev[currPosition];
    }
-
-   path.unshift(endCoords);
 
    clearVisitedCells([...visited.values()], cols, elems);
 
@@ -542,7 +543,7 @@ async function aStar(grid, startCoords, endCoords, elems) {
    const gScore = new Array(rows * cols).fill(Infinity);
    const fScore = new Array(rows * cols).fill(Infinity);
    const dirs = [[-1, 0], [0, 1], [1, 0], [0, -1]];
-   const path = [];
+   let path = [endCoords];
 
    const h = (y, x) => Math.abs(endCoords[0] - y) + Math.abs(endCoords[1] - x);
    
@@ -596,13 +597,16 @@ async function aStar(grid, startCoords, endCoords, elems) {
    let currPosition = endPosition;
    let currCell = prev[currPosition];
 
-   while (currCell && currPosition !== startPosition) {
+   while (currPosition !== startPosition) {
+      if (!currCell) {
+         path = [];
+         break;
+      }
+
       path.push(currCell);
       currPosition = getPosition(...currCell, cols);
       currCell = prev[currPosition];
    }
-
-   path.unshift(endCoords);
 
    clearVisitedCells([...visited.values()], cols, elems);
 
