@@ -1,7 +1,9 @@
 import { useContext, useState, useRef, useEffect } from 'react';
 import { SortingContext } from '../../contexts/sorting';
+import { GlobalContext } from '../../contexts/global';
 import Overlay from '../../components/overlay/overlay.component';
 import Toolbar from '../../components/toolbar/toolbar.component';
+import HomeLink from '../../components/home-link/home-link.component';
 import Button, { ButtonTypes } from '../../components/button/button.component';
 import Dropdown from '../../components/dropdown/dropdown.component';
 import DropdownItem from '../../components/dropdown-item/dropdown-item.component';
@@ -25,6 +27,7 @@ function formatAlgName(algName) {
 
 export default function Sorting() {
    const {size, setSize, algorithm, setAlgorithm, isRunning, setIsRunning} = useContext(SortingContext);
+   const {isTablet, setIsTablet} = useContext(GlobalContext);
    const [array, setArray] = useState(generateRandomArray(size));
    const [maxSize, setMaxSize] = useState(200);
    const barRefs = useRef([]);
@@ -41,9 +44,11 @@ export default function Sorting() {
       const updateMaxSize = () => {
          const currWidth = window.innerWidth;
 
-         if (currWidth <= device.mb && maxSize !== maxArraySizes.mb) setSizeForCurrDevice(maxArraySizes.mb);   //SET MAX ARRAY SIZE FOR MOBILE
-         else if (currWidth > device.mb && currWidth <= device.lp && maxSize !== maxArraySizes.lp) setSizeForCurrDevice(maxArraySizes.lp);   //BIGGER THAN MOBILE SMALLER THAN LAPTOP
-         else if (currWidth > device.lp && maxSize !== maxArraySizes.dt) setSizeForCurrDevice(maxArraySizes.dt);  //BIGGER THAN LAPTOP
+         setIsTablet(window.innerWidth < device.tb);
+
+         if (currWidth <= device.mb && maxSize !== maxArraySizes.mb) setSizeForCurrDevice(maxArraySizes.mb);
+         else if (currWidth > device.mb && currWidth <= device.lp && maxSize !== maxArraySizes.lp) setSizeForCurrDevice(maxArraySizes.lp);
+         else if (currWidth > device.lp && maxSize !== maxArraySizes.dt) setSizeForCurrDevice(maxArraySizes.dt);
       }
 
       updateMaxSize();
@@ -76,6 +81,7 @@ export default function Sorting() {
       <>
          <Overlay isRunning={isRunning} />
          <Toolbar>
+            <HomeLink/>
             <Dropdown name={'Algorithms'}>
                {
                   Object.values(algNamesSort).map(alg => (
@@ -83,14 +89,26 @@ export default function Sorting() {
                   ))
                }
             </Dropdown>
-            <RangeSlider name={'Size'} width={'15%'} min='10' max={maxSize} value={size} changeHandler={handleChange} />
-            <Button clickHandler={handleGenerate} name={'Generate array'} styleType={ButtonTypes.filled} />
-            <Button clickHandler={handleSort} name={'Sort'} styleType={ButtonTypes.transparent} />
+            <RangeSlider name={'Size'} min='10' max={maxSize} value={size} changeHandler={handleChange} />
+            {
+               !isTablet && 
+               <>
+                  <Button clickHandler={handleGenerate} name={'Generate array'} styleType={ButtonTypes.filled} />
+                  <Button clickHandler={handleSort} name={'Sort'} styleType={ButtonTypes.transparent} />
+               </>
+            }
          </Toolbar>
          <S.AppContainer>
             <DataBar algorithm={algorithm} extraInfo={`Size: ${size}`} />
             <SortArrayContainer refs={barRefs} array={array} />
          </S.AppContainer>
+         {
+            isTablet &&
+            <Toolbar vertical>
+               <Button clickHandler={handleGenerate} name={'Generate array'} styleType={ButtonTypes.filled} />
+               <Button clickHandler={handleSort} name={'Sort'} styleType={ButtonTypes.transparent} />
+            </Toolbar>
+         }
       </>
    )
 }

@@ -1,7 +1,9 @@
 import { useContext, useState, useRef, useEffect } from 'react';
 import { PathfindingContext } from '../../contexts/pathfinding';
+import { GlobalContext } from '../../contexts/global';
 import Overlay from '../../components/overlay/overlay.component';
 import Toolbar from '../../components/toolbar/toolbar.component';
+import HomeLink from '../../components/home-link/home-link.component';
 import Button, { ButtonTypes } from '../../components/button/button.component';
 import Dropdown from '../../components/dropdown/dropdown.component';
 import DropdownItem from '../../components/dropdown-item/dropdown-item.component';
@@ -10,6 +12,7 @@ import DataBar from "../../components/data-bar/data-bar.component";
 import { algNamesPathfinding, algNamesMaze } from "./pathfinding-algorithm-names";
 import { generateEmptyGrid, clearGrid, pathfindingAlgorithms, mazeAlgorithms } from './pathfinding-algorithms';
 import { getCurrentDimensions } from '../../contexts/pathfinding';
+import { device } from '../../breakpoints';
 import _ from 'lodash';
 import * as S from './pathfinding.styles';
 
@@ -28,6 +31,7 @@ export default function Pathfinding() {
       isRunning,
       setIsRunning
    } = useContext(PathfindingContext);
+   const {isTablet, setIsTablet} = useContext(GlobalContext);
    const [gridWidth, gridHeight] = gridSize;
    const [grid, setGrid] = useState(generateEmptyGrid(gridHeight, gridWidth));
    const [coords, setCoords] = useState({ source: [1, 1], dest: [gridHeight - 2, gridWidth - 2]});
@@ -36,6 +40,8 @@ export default function Pathfinding() {
    useEffect(() => {
       const updateSize = () => {
          const [newWidth, newHeight] = getCurrentDimensions();
+
+         setIsTablet(window.innerWidth < device.tb);
 
          if (newWidth !== gridWidth || newHeight !== gridHeight) {
             clearGrid(cellRefs.current);
@@ -82,6 +88,7 @@ export default function Pathfinding() {
       <>
          <Overlay isRunning={isRunning} />
          <Toolbar>
+            <HomeLink />
             <Dropdown name={'Algorithms'}>
                {
                   Object.values(algNamesPathfinding).map(alg => (
@@ -96,14 +103,27 @@ export default function Pathfinding() {
                   ))
                }
             </Dropdown>
-            <Button clickHandler={handleGenerateMaze} name={'Generate maze'} styleType={ButtonTypes.filled} />
-            <Button clickHandler={handleClearGrid} name={'Clear grid'} styleType={ButtonTypes.filled} />
-            <Button clickHandler={handleFindPath} name={'Find path'} styleType={ButtonTypes.transparent} />
+            {
+               !isTablet &&
+               <>
+                  <Button clickHandler={handleGenerateMaze} name={'Generate maze'} styleType={ButtonTypes.filled} />
+                  <Button clickHandler={handleClearGrid} name={'Clear grid'} styleType={ButtonTypes.filled} />
+                  <Button clickHandler={handleFindPath} name={'Find path'} styleType={ButtonTypes.transparent} />
+               </>
+            }
          </Toolbar>
          <S.AppContainer>
             <DataBar algorithm={pathfindingAlgorithm} extraInfo={`Maze: ${mazeAlgorithm}`} />
             <Grid refs={cellRefs} grid={grid} updateGrid={setGrid} updateCoords={setCoords} start={coords.source} dest={coords.dest} />
          </S.AppContainer>
+         {
+            isTablet &&
+            <Toolbar vertical>
+               <Button clickHandler={handleGenerateMaze} name={'Generate maze'} styleType={ButtonTypes.filled} />
+               <Button clickHandler={handleClearGrid} name={'Clear grid'} styleType={ButtonTypes.filled} />
+               <Button clickHandler={handleFindPath} name={'Find path'} styleType={ButtonTypes.transparent} />
+            </Toolbar>
+         }
       </>
    )
 }

@@ -3,6 +3,7 @@ import { css } from "styled-components";
 export const device = {
    mbmin: 400,   // for small screen mobile
    mb: 600,   // for mobile screen 
+   tbmin: 750, //for small tablets
    tb: 900,   // for tablets
    lp: 1280,  // for laptops
    dt: 1440,  // for desktops

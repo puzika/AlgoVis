@@ -6,6 +6,7 @@ export const Button = styled.button`
    color: inherit;
    padding: 0 2rem;
    height: 4.5rem;
+   flex-shrink: 0;
    border: .2rem solid ${svar.colorPrimaryLight}; 
    border-radius: 10rem;
    outline: none;
@@ -19,7 +20,9 @@ export const Button = styled.button`
       'transparent'
    };
 
-   &:hover {
-      background-color: ${svar.colorPrimaryLighter};
+   @media (hover: hover) {
+      &:hover {
+         background-color: ${svar.colorPrimaryLighter};
+      }
    }
 `;

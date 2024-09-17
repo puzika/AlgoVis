@@ -450,7 +450,7 @@ async function breadthFirstSearch(grid, startCoords, endCoords, elems) {
 
    clearVisitedCells([...visited.values()], cols, elems);
 
-   reconstructPath(path, cols, elems);
+   await reconstructPath(path, cols, elems);
 
    console.log(path);
 
@@ -528,7 +528,7 @@ async function dijkstrasAlgorithm(grid, startCoords, endCoords, elems) {
 
    clearVisitedCells([...visited.values()], cols, elems);
 
-   reconstructPath(path, cols, elems);
+   await reconstructPath(path, cols, elems);
 
    console.log(path);
 
@@ -610,7 +610,7 @@ async function aStar(grid, startCoords, endCoords, elems) {
 
    clearVisitedCells([...visited.values()], cols, elems);
 
-   reconstructPath(path, cols, elems);
+   await reconstructPath(path, cols, elems);
 
    console.log(path);
 
