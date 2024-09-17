@@ -10,8 +10,8 @@ const gridHeights = {
 const gridWidths = {
    mb: 15,
    tb: 25,
-   lp: 35,
-   tv: 45,
+   lp: 45,
+   tv: 65,
 }
 
 export function getCurrentDimensions() {
@@ -32,16 +32,19 @@ export function getCurrentDimensions() {
 export const PathfindingContext = createContext({
    mazeAlgorithm: '',
    pathfindingAlgorithm: '',
-   setMazeAlgorithm: () => {},
-   setPathfindingAlgorithm: () => {},
+   setMazeAlgorithm: () => null,
+   setPathfindingAlgorithm: () => null,
    gridSize: [],
-   setGridSize: () => {},
+   setGridSize: () => null,
+   isRunning: false,
+   setIsRunning: () => null,
 });
 
 export default function PathfindingProvider({children}) {
    const [mazeAlgorithm, setMazeAlgorithm] = useState(algNamesMaze.huntandkill);
    const [pathfindingAlgorithm, setPathfindingAlgorithm] = useState(algNamesPathfinding.astar);
    const [gridSize, setGridSize] = useState(getCurrentDimensions());
+   const [isRunning, setIsRunning] = useState(false);
 
    const value = {
       mazeAlgorithm,
@@ -50,6 +53,8 @@ export default function PathfindingProvider({children}) {
       setPathfindingAlgorithm,
       gridSize,
       setGridSize,
+      isRunning,
+      setIsRunning
    }
 
    return <PathfindingContext.Provider value={value}>{children}</PathfindingContext.Provider>

@@ -1,5 +1,6 @@
 import { useContext, useState, useRef, useEffect } from 'react';
 import { SortingContext } from '../../contexts/sorting';
+import Overlay from '../../components/overlay/overlay.component';
 import Toolbar from '../../components/toolbar/toolbar.component';
 import Button, { ButtonTypes } from '../../components/button/button.component';
 import Dropdown from '../../components/dropdown/dropdown.component';
@@ -23,7 +24,7 @@ function formatAlgName(algName) {
 }
 
 export default function Sorting() {
-   const {size, setSize, algorithm, setAlgorithm} = useContext(SortingContext);
+   const {size, setSize, algorithm, setAlgorithm, isRunning, setIsRunning} = useContext(SortingContext);
    const [array, setArray] = useState(generateRandomArray(size));
    const [maxSize, setMaxSize] = useState(200);
    const barRefs = useRef([]);
@@ -64,13 +65,16 @@ export default function Sorting() {
    }
 
    async function handleSort() {
+      setIsRunning(true);
       const algName = formatAlgName(algorithm);
       const sortedArray = await sortAlgorithms[algName]([...array], barRefs.current);
       setArray(sortedArray);
+      setIsRunning(false);
    }
 
    return (
       <>
+         <Overlay isRunning={isRunning} />
          <Toolbar>
             <Dropdown name={'Algorithms'}>
                {

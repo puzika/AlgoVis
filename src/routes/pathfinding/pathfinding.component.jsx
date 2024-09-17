@@ -1,5 +1,6 @@
 import { useContext, useState, useRef, useEffect } from 'react';
 import { PathfindingContext } from '../../contexts/pathfinding';
+import Overlay from '../../components/overlay/overlay.component';
 import Toolbar from '../../components/toolbar/toolbar.component';
 import Button, { ButtonTypes } from '../../components/button/button.component';
 import Dropdown from '../../components/dropdown/dropdown.component';
@@ -17,7 +18,16 @@ function formatAlgName(algName) {
 }
 
 export default function Pathfinding() {
-   const {mazeAlgorithm, pathfindingAlgorithm, setMazeAlgorithm, setPathfindingAlgorithm, gridSize, setGridSize} = useContext(PathfindingContext);
+   const {
+      mazeAlgorithm, 
+      pathfindingAlgorithm, 
+      setMazeAlgorithm, 
+      setPathfindingAlgorithm, 
+      gridSize, 
+      setGridSize,
+      isRunning,
+      setIsRunning
+   } = useContext(PathfindingContext);
    const [gridWidth, gridHeight] = gridSize;
    const [grid, setGrid] = useState(generateEmptyGrid(gridHeight, gridWidth));
    const [coords, setCoords] = useState({ source: [1, 1], dest: [gridHeight - 2, gridWidth - 2]});
@@ -45,10 +55,12 @@ export default function Pathfinding() {
    }, [grid]);
 
    async function handleGenerateMaze() {
+      setIsRunning(true);
       const algName = formatAlgName(mazeAlgorithm);
       const clone = _.cloneDeep(grid);
       const newGrid = await mazeAlgorithms[algName](clone, coords.source, coords.dest, cellRefs.current);
       setGrid(newGrid);
+      setIsRunning(false);
    }
 
    function handleClearGrid() {
@@ -58,14 +70,17 @@ export default function Pathfinding() {
    }
 
    async function handleFindPath() {
+      setIsRunning(true);
       const algName = formatAlgName(pathfindingAlgorithm);
       const clone = _.cloneDeep(grid);
       const newGrid = await pathfindingAlgorithms[algName](clone, coords.source, coords.dest, cellRefs.current);
       setGrid(newGrid);
+      setIsRunning(false);
    }
 
    return (
       <>
+         <Overlay isRunning={isRunning} />
          <Toolbar>
             <Dropdown name={'Algorithms'}>
                {
