@@ -2,7 +2,7 @@ import styled from "styled-components";
 import * as svar from '../../variables.styles';
 
 export const Overlay = styled.div`
-   position: absolute;
+   position: fixed;
    top: 0;
    left: 0;
    width: 100%;
